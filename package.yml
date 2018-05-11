@@ -1,0 +1,16 @@
+package: access_control
+version: '1.0.0'
+author: 'Wolfgang Busch'
+supportpage: redaxo.org/forum/
+
+page:
+    title: 'translate:access_control'
+    perm: access_control[]
+    subpages:
+        introduction: { title: 'translate:introduction' }
+        description:  { title: 'translate:description' }
+        details:      { title: 'translate:details' }
+        settings:     { title: 'translate:settings' }
+
+requires:
+    redaxo: ^5.3.0
