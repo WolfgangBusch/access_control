@@ -260,7 +260,7 @@ function login_page() {
        endif;
      if($loggedin):
        $error="<span class=\"access_control_success\">".
-          rex_i18n::msg("access_control_user")."\"".$member."\" ".
+          rex_i18n::msg("access_control_user")." \"".$member."\" ".
           rex_i18n::msg("access_control_loggedin")."</span>";
        # --- set login SESSION variable
        self::member_session("set");
