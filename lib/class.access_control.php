@@ -35,15 +35,12 @@ function member_session($func) {
    #
    # --- set session variable
    if($func=="set"):
-     session_start();
      $_SESSION[$instname][$system_id]['MEMBER_LOGIN']=$member_login;
-     $_SESSION[$instname][$system_id]['STAMP']=time();
      return;
      endif;
    # --- empty session variable
    if($func=="end"):
      $_SESSION[$instname][$system_id]['MEMBER_LOGIN']="";
-     $_SESSION[$instname][$system_id]['STAMP']="";
      return;
      endif;
    #
@@ -214,6 +211,88 @@ function print_file($file) {
      $managed_media=new rex_managed_media(rex_path::media($file));
      endif;
    (new rex_media_manager($managed_media))->sendMedia();
+   }
+function login_page() {
+   #   Displaying a login page for a visitor to get authenticated
+   #   used functions:
+   #      self::member_session("name");
+   #      self::member_session("pwd");
+   #      self::user_logged_in();
+   #      self::member_session("set");
+   #
+   if(rex::isBackend()):
+     echo "<p>".rex_i18n::msg("access_control_login_page_backend")."</p>\n";
+     else:
+     #
+     # --- Constants
+     $username=rex_i18n::msg("access_control_user_name");
+     $pwd     =rex_i18n::msg("access_control_password");
+     $member=self::member_session("name");
+     $mempwd=self::member_session("pwd");
+     if(empty($member) or empty($mempwd))
+       echo "<p class=\"access_control_error\">".
+          rex_i18n::msg("access_control_configure_member")."</p>\n";
+     #
+     # --- get login name and password
+     $login=$_POST["login"];
+     $passwd=$_POST["passwd"];
+     #
+     # --- already authenticated?
+     $loggedin=FALSE;
+     $auth=self::user_logged_in();
+     $user=$auth[session];
+     if(!empty($user)):
+       $login=$user;
+       $loggedin=TRUE;
+       else:
+       #
+       # --- analysing the input values
+       $error="";
+       if($passwd!=$mempwd) $error=
+          rex_i18n::msg("access_control_wrong_password");
+       if(empty($passwd))   $error=
+          rex_i18n::msg("access_control_input_password");
+       if($login!=$member)  $error=
+          rex_i18n::msg("access_control_wrong_user_name");
+       if(empty($login))    $error=
+          rex_i18n::msg("access_control_input_user_password");
+       if(empty($error)) $loggedin=TRUE;
+       endif;
+     if($loggedin):
+       $error="<span class=\"access_control_success\">".
+          rex_i18n::msg("access_control_user")."\"".$member."\" ".
+          rex_i18n::msg("access_control_loggedin")."</span>";
+       # --- set login SESSION variable
+       self::member_session("set");
+       endif;
+     #
+     # --- input form for User/password
+     $art_id=rex_article::getCurrentId();
+     $clang_id=rex_clang::getCurrentId();
+     $self=rex_getUrl($art_id,$clang_id);
+     echo "<div class=\"access_control_indent\">\n".
+        "<div class=\"access_control_frame\">\n".
+        "<p class=\"access_control_error\">".$error."</p>\n".
+        "<form action=\"".$self."\" method=\"post\">\n".
+        "<table>\n".
+        "    <tr><td>".$username.": &nbsp;</td>\n".
+        "        <td><input type=\"text\" name=\"login\" ".
+        "value=\"".$login."\" ".
+        "class=\"form-control access_control_width\" /></td>".
+        "</tr>\n".
+        "    <tr><td>".$pwd.":</td>\n".
+        "        <td><input type=\"password\" name=\"passwd\" ".
+        "value=\"".$passwd."\" ".
+        "class=\"form-control access_control_width\" /></td>".
+        "</tr>\n".
+        "    <tr><td>&nbsp;</td>\n".
+        "        <td><input class=\"form-control\" ".
+        "type=\"submit\" value=\"anmelden\" /></td></tr>\n".
+        "</table>\n".
+        "</form>\n".
+        "</div>\n".
+        "</div>\n";
+     endif;
    }
 }
 ?>
