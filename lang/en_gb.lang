@@ -6,6 +6,7 @@ access_control_description  = Description
 access_control_settings     = Settings
 access_control_details      = Details
 #   addon files
+access_control_login_page_backend  = Displaying a login page for authentication as member user
 access_control_login_page          = Login page
 access_control_user_name           = User name
 access_control_password            = Password
