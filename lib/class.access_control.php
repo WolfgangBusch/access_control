@@ -14,6 +14,9 @@ function member_session($func) {
    #      "set":  authenticate (log in) the member user,
    #              i.e. set the appropriate session variable,
    #              return value ""
+   #      "end":  log out the member user,
+   #              i.e. empty the appropriate session variable,
+   #              return value ""
    #      "get":  return user name of the member user (= value of the
    #              session variable, if he is logged in)
    #              return value "" (otherwise)
@@ -32,8 +35,15 @@ function member_session($func) {
    #
    # --- set session variable
    if($func=="set"):
+     session_start();
      $_SESSION[$instname][$system_id]['MEMBER_LOGIN']=$member_login;
      $_SESSION[$instname][$system_id]['STAMP']=time();
+     return;
+     endif;
+   # --- empty session variable
+   if($func=="end"):
+     $_SESSION[$instname][$system_id]['MEMBER_LOGIN']="";
+     $_SESSION[$instname][$system_id]['STAMP']="";
      return;
      endif;
    #
@@ -42,10 +52,8 @@ function member_session($func) {
      return $_SESSION[$instname][$system_id]['MEMBER_LOGIN'];
    #
    # --- return member user's user name or password
-   if($func=="name")
-     return $member_login;
-   if($func=="pwd")
-     return $member_password;
+   if($func=="name") return $member_login;
+   if($func=="pwd")  return $member_password;
    }
 function get_rex_editor() {
    #   returns die Redaxo editor's user name, if he is logged in
