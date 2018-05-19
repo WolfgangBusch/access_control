@@ -93,15 +93,14 @@ function user_logged_in() {
    return $auth;
    }
 function protected_or_forbidden() {
-   #   determine if access to an article needs to be denied,
+   #   determine if access to the current article needs to be denied,
    #   return value:
    #      1, if the article is located in the protected area and the
    #         visitor is not authenticated
    #      2, if the article is located in the forbidden area and the
    #         visitor is not authenticated as site adminstrator
    #   used functions:
-   #      self::please_login()
-   #      self::stay_out()
+   #      self::no_access($art,$kont)
    #
    #   exemplary section of the page template, show an error message
    #   instead of the article content
@@ -119,54 +118,60 @@ function protected_or_forbidden() {
    #      ...
    #
    $rc=0;
-   if(self::no_access(1)) $rc=1;  // protected area
-   if(self::no_access(2)) $rc=2;  // forbidden area
+   $art=rex_article::getCurrent();
+   if(self::no_access($art,1)<=0) $rc=1;  // protected area
+   if(self::no_access($art,2)<=0) $rc=2;  // forbidden area
    return $rc;
    }
-function no_access($kont) {
-   #   determine if access to an article needs to be denied,
-   #   return value:
-   #      TRUE,  if the article is located in the protected or in the
-   #             forbidden area respectively, and the visitor is not
-   #             authenticated as authorized user
-   #      FALSE, otherwise, or no protected area or no forbidden area
-   #             is configurated, respectively
+function no_access($art,$kont) {
+   #   determine if an article is located in a protected or forbidden
+   #   area, respectively, and if access is allowed or to be denied
+   #   $art               given article object
    #   $kont              <=1: proof the access on the protected area
    #                      >=2: proof the access on the forbidden area
+   #   return value:
+   #      1: no protected/forbidden area is configured
+   #      2: the article is not located in the protected/forbidden area
+   #      3: the article is located in the protected/forbidden area,
+   #         but the visitor is authenticated as authorized user
+   #      0: the article is located in the protected/forbidden area,
+   #         and the visitor is not authenticated as authorized user
+   #         access is to be denied
+   #   used functions:
+   #      self::user_logged_in()
    #
+   $rc=1;
    if($kont<=1):
      $cat_id=rex_config::get('access_control','cat_protected_id');
      else:
      $cat_id=rex_config::get('access_control','cat_forbidden_id');
      endif;
-   $stayout=FALSE;
    if(!empty($cat_id)):
      #
-     # --- current article in protected / forbidden area?
-     $art=rex_article::getCurrent();
-     $noacc=FALSE;
-     if($art->getId()==$cat_id) $noacc=TRUE;
+     # --- article in protected / forbidden area?
+     $rc=2;
+     if($art->getId()==$cat_id) $rc=3;
      $arr=explode("|",$art->getValue("path"));
      for($i=1;$i<count($arr)-1;$i=$i+1)
-        if($arr[$i]==$cat_id) $noacc=TRUE;
+        if($arr[$i]==$cat_id) $rc=3;
      #
      # --- article in protected / forbidden area, is the visitor authenticated?
-     if($noacc):
+     if($rc==3):
        if($kont<=1):
          $auth=self::user_logged_in();
          if(empty($auth[redaxo]) and empty($auth[ycom]) and empty($auth[session])):
-           $stayout=TRUE;
+           $rc=0;
            endif;
          else:
          $uid=0;
          if(rex_backend_login::createUser()) $uid=rex::getUser()->getId();
          if($uid!=1):
-           $stayout=TRUE;
+           $rc=0;
            endif;
          endif;
        endif;
      endif;
-   return $stayout;
+   return $rc;
    }
 function media2protect($file) {
    #   determine if access to a media file is to be denied,
@@ -192,12 +197,32 @@ function media2protect($file) {
    if($catid==$medcat_protected_id) return TRUE;
    return FALSE;
    }
+function sendFile($file,$contentType,$contentDisposition='inline') {
+   #   modified Redaxo rex_response::sendFile(...)
+   #   this version always delivers the original file content, no cache is used
+   #   used functions:
+   #      rex_response::cleanOutputBuffers()
+   #      rex_response::sendContentType($contentType)
+   #
+   rex_response::cleanOutputBuffers();
+   if(!file_exists($file)):
+     header('HTTP/1.1 '.rex_response::HTTP_NOT_FOUND);
+     exit;
+     endif;
+   session_write_close();
+   rex_response::sendContentType($contentType);
+   header('Content-Disposition: '.$contentDisposition.'; filename="'.basename($file).'"');
+   if(!ini_get('zlib.output_compression'))
+     header('Content-Length: '.filesize($file));
+   readfile($file);
+   }
 function print_file($file) {
    #   displaying a media file, if no access is allowed a general error
    #   file ('protected.gif') is displayed instead
    #   used functions:
    #      self::user_logged_in()
    #      self::media2protect($file)
+   #      self::sendFile($medfile,$type,$contentDisposition)
    #
    if(rex::isBackend() or empty($file) or
       !file_exists(rex_path::media($file))) return;
@@ -205,12 +230,22 @@ function print_file($file) {
    $auth=self::user_logged_in();
    if(self::media2protect($file) and
       empty($auth[redaxo]) and empty($auth[ycom]) and empty($auth[session])):
-     $media=rex_path::addonAssets('access_control','protected.gif');
-     $managed_media=new rex_managed_media($media);
+     #     error file displayed
+     $errfile=rex_path::addonAssets('access_control','protected.gif');
+     $managed_media=new rex_managed_media($errfile);
+     (new rex_media_manager($managed_media))->sendMedia();
      else:
-     $managed_media=new rex_managed_media(rex_path::media($file));
+     $medfile=rex_path::media($file);
+     $type=mime_content_type($medfile);
+     if(substr($type,0,5)=="image" or $type="text/plain" or $type=="application/pdf"):
+       #     images and pdf displayed by sendMedia()
+       $managed_media=new rex_managed_media($medfile);
+       (new rex_media_manager($managed_media))->sendMedia();
+       else:
+       #     files downloaded by sendFile(), accounting large files
+       self::sendFile($medfile,$type,'attachment');
+       endif;
      endif;
-   (new rex_media_manager($managed_media))->sendMedia();
    }
 function login_page() {
    #   Displaying a login page for a visitor to get authenticated
