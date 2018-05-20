@@ -197,21 +197,22 @@ function media2protect($file) {
    if($catid==$medcat_protected_id) return TRUE;
    return FALSE;
    }
-function sendFile($file,$contentType,$contentDisposition='inline') {
-   #   modified Redaxo rex_response::sendFile(...)
+function sendFile($file,$contentType,$contentDispos) {
+   #   modified Redaxo rex_response::sendFile(...) to download files
    #   this version always delivers the original file content, no cache is used
+   #   $file              given media file (absolute file name)
+   #   $contentType       content mime type of the given file
+   #   $contentDispos     content disposition of the given file
    #   used functions:
    #      rex_response::cleanOutputBuffers()
    #      rex_response::sendContentType($contentType)
    #
    rex_response::cleanOutputBuffers();
-   if(!file_exists($file)):
-     header('HTTP/1.1 '.rex_response::HTTP_NOT_FOUND);
-     exit;
-     endif;
+   #     prevent session locking while sending huge files
    session_write_close();
+   #     send content characteristics
    rex_response::sendContentType($contentType);
-   header('Content-Disposition: '.$contentDisposition.'; filename="'.basename($file).'"');
+   header('Content-Disposition: '.$contentDispos.'; filename="'.basename($file).'"');
    if(!ini_get('zlib.output_compression'))
      header('Content-Length: '.filesize($file));
    readfile($file);
@@ -222,7 +223,7 @@ function print_file($file) {
    #   used functions:
    #      self::user_logged_in()
    #      self::media2protect($file)
-   #      self::sendFile($medfile,$type,$contentDisposition)
+   #      self::sendFile($medfile,$type,$contentDispos)
    #
    $medfile=rex_path::media($file);
    if(rex::isBackend() or empty($file) or !file_exists($medfile)) return;
