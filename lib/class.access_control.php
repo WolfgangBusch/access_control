@@ -224,8 +224,8 @@ function print_file($file) {
    #      self::media2protect($file)
    #      self::sendFile($medfile,$type,$contentDisposition)
    #
-   if(rex::isBackend() or empty($file) or
-      !file_exists(rex_path::media($file))) return;
+   $medfile=rex_path::media($file);
+   if(rex::isBackend() or empty($file) or !file_exists($medfile)) return;
    #
    $auth=self::user_logged_in();
    if(self::media2protect($file) and
@@ -235,9 +235,8 @@ function print_file($file) {
      $managed_media=new rex_managed_media($errfile);
      (new rex_media_manager($managed_media))->sendMedia();
      else:
-     $medfile=rex_path::media($file);
      $type=mime_content_type($medfile);
-     if(substr($type,0,5)=="image" or $type="text/plain" or $type=="application/pdf"):
+     if(substr($type,0,5)=="image" or $type=="text/plain" or $type=="application/pdf"):
        #     images and pdf displayed by sendMedia()
        $managed_media=new rex_managed_media($medfile);
        (new rex_media_manager($managed_media))->sendMedia();
