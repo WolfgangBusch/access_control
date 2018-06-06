@@ -3,7 +3,7 @@
  * Access Control AddOn
  * @author wolfgang[at]busch-dettum[dot]de Wolfgang Busch
  * @package redaxo5
- * @version Mai 2018
+ * @version Juni 2018
  */
 $stx='style="white-space:nowrap;"';
 $sty='style="padding-left:20px; white-space:nowrap;"';
@@ -78,9 +78,9 @@ echo $string;
 #
 # --- save the new configuration parameters (after submit)
 if(!empty($_POST['sendit'])):
-  rex_config::set('access_control','cat_forbidden_id',   $forb_id);
-  rex_config::set('access_control','cat_protected_id',   $prot_id);
-  rex_config::set('access_control','medcat_protected_id',$protmed_id);
+  rex_config::set('access_control','cat_forbidden_id',   intval($forb_id));
+  rex_config::set('access_control','cat_protected_id',   intval($prot_id));
+  rex_config::set('access_control','medcat_protected_id',intval($protmed_id));
   rex_config::set('access_control','member_login',       $memb_login);
   rex_config::set('access_control','member_password',    $memb_pwd);
   endif;
