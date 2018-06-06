@@ -3,12 +3,12 @@
  * Access Control AddOn
  * @author wolfgang[at]busch-dettum[dot]de Wolfgang Busch
  * @package redaxo5
- * @version Mai 2018
+ * @version Juni 2018
  */
 #
 class access_control_install {
 #
-function sql_action($sql,$query) {
+public static function sql_action($sql,$query) {
    #   performing an SQL action using setQuery()
    #   including error message if fails
    #   $sql               SQL handle
@@ -22,7 +22,7 @@ function sql_action($sql,$query) {
         }
    if(!empty($error)) echo rex_view::error($error);
    }
-function define_modul_out() {
+public static function define_modul_out() {
    #   returning the module source code (output part)
    #
    return
@@ -30,7 +30,7 @@ function define_modul_out() {
 access_control::login_page();
 ?>';
    }
-function insert_module($mypackage) {
+public static function insert_module($mypackage) {
    #   creating the module (output part)
    #   functions used:
    #      self::define_modul_out()

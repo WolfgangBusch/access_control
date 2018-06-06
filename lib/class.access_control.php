@@ -3,12 +3,12 @@
  * Access Control AddOn
  * @author wolfgang[at]busch-dettum[dot]de Wolfgang Busch
  * @package redaxo5
- * @version Mai 2018
+ * @version Juni 2018
  */
 #
 class access_control {
 #
-function member_session($func) {
+public static function member_session($func) {
    #   Returning different values depending on the value of $func
    #   $func=
    #      "set":  authenticate (log in) the member user,
@@ -52,7 +52,7 @@ function member_session($func) {
    if($func=="name") return $member_login;
    if($func=="pwd")  return $member_password;
    }
-function get_rex_editor() {
+public static function get_rex_editor() {
    #   returns die Redaxo editor's user name, if he is logged in
    #   (or "" if not)
    #
@@ -63,7 +63,7 @@ function get_rex_editor() {
      endif;
    return $user;
    }
-function user_logged_in() {
+public static function user_logged_in() {
    #   check if the visitor is logged in one of the following user:
    #   as Redaxo editor or as member user or as YCom user,
    #   return an associative array containing:
@@ -92,7 +92,7 @@ function user_logged_in() {
    #
    return $auth;
    }
-function protected_or_forbidden() {
+public static function protected_or_forbidden() {
    #   determine if access to the current article needs to be denied,
    #   return value:
    #      1, if the article is located in the protected area and the
@@ -123,7 +123,7 @@ function protected_or_forbidden() {
    if(self::no_access($art,2)<=0) $rc=2;  // forbidden area
    return $rc;
    }
-function no_access($art,$kont) {
+public static function no_access($art,$kont) {
    #   determine if an article is located in a protected or forbidden
    #   area, respectively, and if access is allowed or to be denied
    #   $art               given article object
@@ -173,7 +173,7 @@ function no_access($art,$kont) {
      endif;
    return $rc;
    }
-function media2protect($file) {
+public static function media2protect($file) {
    #   determine if access to a media file is to be denied,
    #   return value:
    #      TRUE,  if the media file belongs to the protected media category
@@ -197,7 +197,7 @@ function media2protect($file) {
    if($catid==$medcat_protected_id) return TRUE;
    return FALSE;
    }
-function sendFile($file,$contentType,$contentDispos) {
+public static function sendFile($file,$contentType,$contentDispos) {
    #   modified Redaxo rex_response::sendFile(...) to download files
    #   this version always delivers the original file content, no cache is used
    #   $file              given media file (absolute file name)
@@ -217,7 +217,7 @@ function sendFile($file,$contentType,$contentDispos) {
      header('Content-Length: '.filesize($file));
    readfile($file);
    }
-function print_file($file) {
+public static function print_file($file) {
    #   displaying a media file, if no access is allowed a general error
    #   file ('protected.gif') is displayed instead
    #   used functions:
@@ -247,7 +247,7 @@ function print_file($file) {
        endif;
      endif;
    }
-function login_page() {
+public static function login_page() {
    #   Displaying a login page for a visitor to get authenticated
    #   used functions:
    #      self::member_session("name");
