@@ -4,6 +4,8 @@
  * @author wolfgang[at]busch-dettum[dot]de Wolfgang Busch
  * @package redaxo5
  * @version Juni 2018
-*/
-echo '<div>'.rex_i18n::msg('access_control_help').'</div>';
+ */
+#
+# --- remove the configurated data
+rex_config::removeNamespace("access_control");
 ?>
