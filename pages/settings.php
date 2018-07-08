@@ -3,12 +3,20 @@
  * Access Control AddOn
  * @author wolfgang[at]busch-dettum[dot]de Wolfgang Busch
  * @package redaxo5
- * @version Juni 2018
+ * @version Juli 2018
  */
 $stx='style="white-space:nowrap;"';
-$sty='style="padding-left:20px; white-space:nowrap;"';
+$sty='style="padding-left:20px;"';
 #
-# --- read the inserted values
+# --- read in the configuration parameters
+$conf_forb_id   =rex_config::get('access_control','cat_forbidden_id');
+$conf_prot_id   =rex_config::get('access_control','cat_protected_id');
+$conf_protmed_id=rex_config::get('access_control','medcat_protected_id');
+if($conf_protmed_id=='0') $conf_protmed_id='';
+$conf_memb_login=rex_config::get('access_control','member_login');
+$conf_memb_pwd  =rex_config::get('access_control','member_password');
+#
+# --- read the inserted parameters
 $forb_id   =$_POST['forb_id'];
 $prot_id   =$_POST['prot_id'];
 $protmed_id=$_POST['protmed_id'];
@@ -19,12 +27,23 @@ if(!empty($protmed_id) and intval($protmed_id)<=0):
 $memb_login=$_POST['memb_login'];
 $memb_pwd  =$_POST['memb_pwd'];
 #
-# --- read the configuration parameters
-if($forb_id<=0)        $forb_id   =rex_config::get('access_control','cat_forbidden_id');
-if($prot_id<=0)        $prot_id   =rex_config::get('access_control','cat_protected_id');
-if($protmed_id<=0)     $protmed_id=rex_config::get('access_control','medcat_protected_id');
-if(empty($memb_login)) $memb_login=rex_config::get('access_control','member_login');
-if(empty($memb_pwd))   $memb_pwd  =rex_config::get('access_control','member_password');
+if(empty($_POST['sendit'])):
+  #
+  # --- fill the configuration parameters into the form
+  $forb_id   =$conf_forb_id;
+  $prot_id   =$conf_prot_id;
+  $protmed_id=$conf_protmed_id;
+  $memb_login=$conf_memb_login;
+  $memb_pwd  =$conf_memb_pwd;
+  else:
+  #
+  # --- save the new configuration parameters (after submit)
+  rex_config::set('access_control','cat_forbidden_id',   intval($forb_id));
+  rex_config::set('access_control','cat_protected_id',   intval($prot_id));
+  rex_config::set('access_control','medcat_protected_id',intval($protmed_id));
+  rex_config::set('access_control','member_login',       $memb_login);
+  rex_config::set('access_control','member_password',    $memb_pwd);
+  endif;
 #
 # --- define input buttons and fields
 $input_forb_id   =rex_var_link::getWidget(1,'forb_id',$forb_id);
@@ -56,8 +75,8 @@ $string='
         <td '.$sty.'>'.$input_forb_id.'</td>
         <td '.$sty.'>'.rex_i18n::msg("access_control_settings_col43").'</td></tr>
     <tr><td></td>
-        <td colspan="2" '.$sty.'>(*)<small> &nbsp; '.rex_i18n::msg("access_control_settings_col52").'</small></td></tr>
-    <tr><td colspan="3">';
+        <td colspan="2" '.$sty.'>
+            (*)<small> &nbsp; '.rex_i18n::msg("access_control_settings_col52").'</small></td></tr>';
 echo $string;
 #
 # --- access data for the member user
@@ -71,17 +90,7 @@ $string='
         <td '.$sty.'>'.$input_memb_pwd.'</td>
         <td '.$sty.'></td></tr>
 </table><br/>
-<button class="btn btn-save" type="submit" name="sendit" value="sendit"
-        title="'.rex_i18n::msg("access_control_settings_title").'"> '.rex_i18n::msg("access_control_settings_text").' </button>
+<button class="btn btn-save" type="submit" name="sendit" value="sendit" title="'.rex_i18n::msg("access_control_settings_title").'">'.rex_i18n::msg("access_control_settings_text").'</button></td>
 </form>';
 echo $string;
-#
-# --- save the new configuration parameters (after submit)
-if(!empty($_POST['sendit'])):
-  rex_config::set('access_control','cat_forbidden_id',   intval($forb_id));
-  rex_config::set('access_control','cat_protected_id',   intval($prot_id));
-  rex_config::set('access_control','medcat_protected_id',intval($protmed_id));
-  rex_config::set('access_control','member_login',       $memb_login);
-  rex_config::set('access_control','member_password',    $memb_pwd);
-  endif;
 ?>
