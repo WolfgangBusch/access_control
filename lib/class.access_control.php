@@ -217,9 +217,11 @@ public static function sendFile($file,$contentType,$contentDispos) {
      header('Content-Length: '.filesize($file));
    readfile($file);
    }
-public static function print_file($file) {
+public static function print_file($file,$type) {
    #   displaying a media file, if no access is allowed a general error
    #   file ('protected.gif') is displayed instead
+   #   $file              given media file (relative file name)
+   #   $type              given media type
    #   used functions:
    #      self::user_logged_in()
    #      self::media2protect($file)
@@ -234,16 +236,23 @@ public static function print_file($file) {
      #     error file displayed
      $errfile=rex_path::addonAssets('access_control','protected.gif');
      $managed_media=new rex_managed_media($errfile);
-     (new rex_media_manager($managed_media))->sendMedia();
+     $manager=new rex_media_manager($managed_media);
+     $manager->sendMedia();
      else:
-     $type=mime_content_type($medfile);
-     if(substr($type,0,5)=="image" or $type=="text/plain" or $type=="application/pdf"):
+     $mtype=mime_content_type($medfile);
+     if(substr($mtype,0,5)=="image" or $mtype=="text/plain" or $mtype=="application/pdf"):
        #     images and pdf displayed by sendMedia()
-       $managed_media=new rex_managed_media($medfile);
-       (new rex_media_manager($managed_media))->sendMedia();
+       if(!empty($type)):
+         $counter=rex_media_manager::deleteCache($file,$type);
+         $manager=rex_media_manager::create($type,$file);
+         else:
+         $managed_media=new rex_managed_media($medfile);
+         $manager=new rex_media_manager($managed_media);
+         endif;
+       $manager->sendMedia();
        else:
        #     files downloaded by sendFile(), accounting large files
-       self::sendFile($medfile,$type,'attachment');
+       self::sendFile($medfile,$mtype,'attachment');
        endif;
      endif;
    }
