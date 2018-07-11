@@ -1,4 +1,9 @@
 # access_control
+<h4>Version 1.4.0</h4>
+<ul>
+    <li>Jetzt werden bei der Ausgabe von Bildern auch die Medientypen gemäß
+        Redaxo Media Manager berücksichtigt.</li>
+</ul>
 <h4>Version 1.3.0</h4>
 <ul>
     <li>Jetzt lassen sich alle Konfigurationsparameter einzeln zurücksetzen
