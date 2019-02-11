@@ -31,7 +31,7 @@ access_control_descr_par4     = Bei fehlender Zugriffsberechtigung wird anstelle
 #   documentation details
 access_control_details_head1  = Adressumleitung der Mediendateien
 access_control_details_par1a  = Standardmäßig wird eine Mediendatei in einer der beiden folgenden Formen in einer Bild- oder Artikel-Referenz adressiert
-access_control_details_par1b  = Für die Überprüfung der Zugriffsberechtigung auf eine Mediendatei muss zunächst deren Dateiname aus der Dateiadresse ermittelt werden. Im zweiten Form kann er leicht als Adressparameter abgespalten werden. Die erste Form wird daher überführt in
+access_control_details_par1b  = Für die Überprüfung der Zugriffsberechtigung auf eine Mediendatei muss zunächst deren Dateiname aus der Dateiadresse ermittelt werden. In der zweiten Form kann er leicht als Adressparameter abgespalten werden. Die erste Form wird daher überführt in
 access_control_details_par1c  = durch eine entsprechende Adressumleitung
 access_control_details_head2  = Zugriffskontrolle auf die aktuelle Seite
 access_control_details_par2a  = Diese AddOn-Funktion liefert folgende Rückgabewerte
