@@ -3,7 +3,7 @@
  * Access Control AddOn
  * @author wolfgang[at]busch-dettum[dot]de Wolfgang Busch
  * @package redaxo5
- * @version Juli 2018
+ * @version Februar 2019
  */
 #
 class access_control {
@@ -67,27 +67,27 @@ public static function user_logged_in() {
    #   check if the visitor is logged in one of the following user:
    #   as Redaxo editor or as member user or as YCom user,
    #   return an associative array containing:
-   #      $auth[redaxo]  = Redaxo editor's user name (or "")
-   #      $auth[session] = member's user name (or "")
-   #      $auth[ycom]    = YCom user's user name (or "")
+   #      $auth['redaxo']  = Redaxo editor's user name (or "")
+   #      $auth['session'] = member's user name (or "")
+   #      $auth['ycom']    = YCom user's user name (or "")
    #   used functions:
    #      self::get_rex_editor()
    #      self::member_session("get")
    #
    # --- authenticated as Redaxo editor?
-   $auth[redaxo]=self::get_rex_editor();
+   $auth['redaxo']=self::get_rex_editor();
    #
    # --- authenticated as member user?
-   $auth[session]=self::member_session("get");
+   $auth['session']=self::member_session("get");
    #
    # --- authenticated as YCom user?
-   $auth[ycom]="";
+   $auth['ycom']="";
    if(rex_addon::get('ycom')->isAvailable()):
      rex_ycom::addTable('rex_ycom_user');
      rex_yform_manager_dataset::setModelClass('rex_ycom_user', rex_ycom_user::class);
      rex_ycom_auth::login([]);
      $us=rex_ycom_auth::getUser();
-     if($us!=NULL) $auth[ycom]=rex_ycom_user::get($us->getId())->login;
+     if($us!=NULL) $auth['ycom']=rex_ycom_user::get($us->getId())->login;
      endif;
    #
    return $auth;
@@ -159,7 +159,7 @@ public static function no_access($art,$kont) {
      if($rc==3):
        if($kont<=1):
          $auth=self::user_logged_in();
-         if(empty($auth[redaxo]) and empty($auth[ycom]) and empty($auth[session])):
+         if(empty($auth['redaxo']) and empty($auth['ycom']) and empty($auth['session'])):
            $rc=0;
            endif;
          else:
@@ -232,7 +232,7 @@ public static function print_file($file,$type) {
    #
    $auth=self::user_logged_in();
    if(self::media2protect($file) and
-      empty($auth[redaxo]) and empty($auth[ycom]) and empty($auth[session])):
+      empty($auth['redaxo']) and empty($auth['ycom']) and empty($auth['session'])):
      #     error file displayed
      $errfile=rex_path::addonAssets('access_control','protected.gif');
      $managed_media=new rex_managed_media($errfile);
@@ -284,7 +284,7 @@ public static function login_page() {
      # --- already authenticated?
      $loggedin=FALSE;
      $auth=self::user_logged_in();
-     $user=$auth[session];
+     $user=$auth['session'];
      if(!empty($user)):
        $login=$user;
        $loggedin=TRUE;
