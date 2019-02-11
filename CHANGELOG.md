@@ -1,4 +1,9 @@
 # access_control
+<h4>Version 1.5.0</h4>
+<ul>
+    <li>Schlüssel von neu definierten assoziativen Arrays werden jetzt als
+        Konstanten (in Apostrophs) behandelt.</li>
+</ul>
 <h4>Version 1.4.0</h4>
 <ul>
     <li>Jetzt werden bei der Ausgabe von Bildern auch die Medientypen gemäß
