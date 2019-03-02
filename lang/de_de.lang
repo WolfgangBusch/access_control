@@ -5,25 +5,13 @@ access_control_introduction = Einführung
 access_control_description  = Beschreibung
 access_control_settings     = Konfiguration
 access_control_details      = Details
-#   addon files
-access_control_login_page_backend  = Anzeige einer Login-Seite zur Authentifizierung als Mitglieds-Benutzer
-access_control_login_page          = Login-Seite
-access_control_user_name           = Benutzername
-access_control_password            = Passwort
-access_control_configure_member    = Bitte zunächst den Mitglieds-Benutzer nebst Passwort konfigurieren!
-access_control_wrong_password      = +++ falsches Passwort
-access_control_input_password      = bitte Passwort eingeben
-access_control_wrong_user_name     = +++ falscher Benutzername
-access_control_input_user_password = bitte Benutzername und Passwort eingeben
-access_control_user                = Benutzer
-access_control_loggedin            = erfolgreich eingeloggt
 #   documentation help
-access_control_help           = Dieses AddOn ermöglicht einen Zugriffsschutz für ausgewählte Bereiche von Artikeln beziehungsweise Mediendateien. Es ist komplett zweisprachig eingerichtet (deutsch, englisch).<br/>Eine Autorisierung für den Zugriff erfolgt nach erfolgreicher Authentifizierung auf einer AddOn-spezifischen Login-Seite. Alternativ ist auch ein authentifizierter YCom-User (Community-AddOn) zugriffsberechtigt.<br/>Es ist nur eine einfache Rewrite-Regel erforderlich.
+access_control_help           = Dieses AddOn ermöglicht einen Zugriffsschutz für ausgewählte Bereiche von Artikeln beziehungsweise Mediendateien. Es ist komplett zweisprachig eingerichtet (deutsch, englisch).<br/>Eine Autorisierung für den Zugriff erfolgt nach erfolgreicher Authentifizierung.<br/>Es ist nur eine einfache Rewrite-Regel erforderlich.
 #   documentation description
 access_control_descr_head1    = Geschützter Bereich
 access_control_descr_par1     = Geschützt werden können alle Artikel und Mediendateien im Pfad unterhalb einer speziellen Kategorie bzw. Medienkategorie. Entsprechende Kategorien werden in der Konfiguration festgelegt. Es bedeutet keine Einschränkung, nur genau eine geschützte Kategorie bzw. Medienkategorie ("geschützter Bereich") vorzusehen, weil jeder Artikel und jede Mediendatei durch geeignetes Verschieben geschützt werden kann.
 access_control_descr_head2    = Mitglieds-Benutzer
-access_control_descr_par2     = Das AddOn bietet einen Modul für eine Login-Seite an, auf der Besucher sich für den Zugriff auf geschützte Bereiche authentifizieren können. Ein entsprechender Benutzername und das zugehörige Passwort können konfiguriert werden. Durch Kenntnis dieser Zugangsdaten wird der Besucher zum Mitglied einer Gemeinschaft. - Das Login ist Session-basiert.<br/>Falls das Community-AddOn YCom installiert ist, hat jeder eingeloggte YCom-Benutzer Zugriff auf die geschützten Bereiche. In dem Fall kann man auf den Mitglieds-Benutzer verzichten. - Ein eingeloggter Redaxo-Redakteur ist immer entsprechend zugriffsberechtigt.
+access_control_descr_par2     = Das AddOn bietet einen Modul für ein LogIn-Formular an, mit dem Besucher sich für den Zugriff auf geschützte Bereiche authentifizieren können. Ein entsprechender Benutzername und das zugehörige Passwort können konfiguriert werden. Durch Kenntnis dieser Zugangsdaten wird der Besucher zum Mitglied einer Gemeinschaft. - Das Login ist Session-basiert.<br/>Ein eingeloggter Redaxo-Redakteur ist immer entsprechend zugriffsberechtigt.
 access_control_descr_head3    = Verbotener Bereich
 access_control_descr_par3     = Der Site-Administrator kann darüber hinaus in der Konfiguration eine Kategorie festlegen, unterhalb der nur er allein Artikel ansehen kann, sobald er eingeloggt ist ("verbotener Bereich").
 access_control_descr_head4    = Überprüfung der Zugriffsberechtigung
@@ -51,5 +39,7 @@ access_control_settings_col41 = verboten
 access_control_settings_col43 = Kategorie-Startartikel
 access_control_settings_col52 = sichtbar nur für den athentifizierten Site-Administrator
 access_control_settings_par2  = <b>Zugangsdaten für den Mitglieds-Benutzer:</b><br/>Niemand Anderer (außer eingeloggten Redakteuren) hat Zugriff auf geschützte Artikel und Mediendateien.<br/>Wenn das Community-AddOn zur Authentifizierung benutzt werden soll, können hier alle Eintragungen entfallen.
+access_control_settings_user  = Benutzername
+access_control_settings_pwd   = Passwort
 access_control_settings_title = gewählte Parameter speichern
 access_control_settings_text  = speichern
