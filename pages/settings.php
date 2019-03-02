@@ -3,7 +3,7 @@
  * Access Control AddOn
  * @author wolfgang[at]busch-dettum[dot]de Wolfgang Busch
  * @package redaxo5
- * @version Februar 2019
+ * @version März 2019
  */
 $stx='style="white-space:nowrap;"';
 $sty='style="padding-left:20px;"';
@@ -16,17 +16,6 @@ if($conf_protmed_id=='0') $conf_protmed_id='';
 $conf_memb_login=rex_config::get('access_control','member_login');
 $conf_memb_pwd  =rex_config::get('access_control','member_password');
 #
-# --- read the inserted parameters
-$forb_id   =$_POST['forb_id'];
-$prot_id   =$_POST['prot_id'];
-$protmed_id=$_POST['protmed_id'];
-if(!empty($protmed_id) and intval($protmed_id)<=0):
-  $media=rex_media::get($protmed_id);
-  $protmed_id=$media->getCategoryId();
-  endif;
-$memb_login=$_POST['memb_login'];
-$memb_pwd  =$_POST['memb_pwd'];
-#
 if(empty($_POST['sendit'])):
   #
   # --- fill the configuration parameters into the form
@@ -36,6 +25,17 @@ if(empty($_POST['sendit'])):
   $memb_login=$conf_memb_login;
   $memb_pwd  =$conf_memb_pwd;
   else:
+  #
+  # --- read the inserted parameters
+  $forb_id   =$_POST['forb_id'];
+  $prot_id   =$_POST['prot_id'];
+  $protmed_id=$_POST['protmed_id'];
+  if(!empty($protmed_id) and intval($protmed_id)<=0):
+    $media=rex_media::get($protmed_id);
+    $protmed_id=$media->getCategoryId();
+    endif;
+  $memb_login=$_POST['memb_login'];
+  $memb_pwd  =$_POST['memb_pwd'];
   #
   # --- save the new configuration parameters (after submit)
   rex_config::set('access_control','cat_forbidden_id',   intval($forb_id));
@@ -57,8 +57,7 @@ $input_memb_pwd  ='<input class="form-control" type="password" name="memb_pwd" v
 ### <input class="form-control" type="text" name="protmed_id" value="***" id="REX_MEDIA_1" readonly />
 #
 # --- protected categories and media categories
-$string='
-<form method="post">
+echo '<form method="post">
 <table style="background-color:inherit;">
     <tr><td colspan="3">
             '.rex_i18n::msg("access_control_settings_par1").'</td></tr>
@@ -77,20 +76,22 @@ $string='
     <tr><td></td>
         <td colspan="2" '.$sty.'>
             (*)<small> &nbsp; '.rex_i18n::msg("access_control_settings_col52").'</small></td></tr>';
-echo $string;
 #
 # --- access data for the member user
-$string='
+echo '
     <tr><td colspan="3"><br/>
             '.rex_i18n::msg("access_control_settings_par2").'</td></tr>
-    <tr><td '.$stx.'>'.rex_i18n::msg("access_control_user_name").':</td>
+    <tr><td '.$stx.'>'.rex_i18n::msg("access_control_settings_user").':</td>
         <td '.$sty.'>'.$input_memb_login.'</td>
         <td '.$sty.'></td></tr>
-    <tr><td '.$stx.'>'.rex_i18n::msg("access_control_password").':</td>
+    <tr><td '.$stx.'>'.rex_i18n::msg("access_control_settings_pwd").':</td>
         <td '.$sty.'>'.$input_memb_pwd.'</td>
         <td '.$sty.'></td></tr>
-</table><br/>
-<button class="btn btn-save" type="submit" name="sendit" value="sendit" title="'.rex_i18n::msg("access_control_settings_title").'">'.rex_i18n::msg("access_control_settings_text").'</button></td>
+    <tr><td '.$sty.'></td>
+        <td '.$sty.' colspan="2"><br/>
+            <button class="btn btn-save" type="submit" name="sendit" value="sendit"
+                    title="'.rex_i18n::msg("access_control_settings_title").'">'.
+            rex_i18n::msg("access_control_settings_text").'</button></td></tr>
+</table>
 </form>';
-echo $string;
 ?>
