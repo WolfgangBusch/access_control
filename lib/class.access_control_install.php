@@ -29,7 +29,7 @@ public static function define_module($mypackage) {
    #      $mod['output']   source of the module's output part
    #   $mypackage          package name
    #
-   $name='Member Login Page ('.$mypackage.')';
+   $name='Member Login ('.$mypackage.')';
    $in='<?php
 $clang_id=rex_clang::getCurrentId();
 $clang_code=rex_clang::get($clang_id)->getCode();
