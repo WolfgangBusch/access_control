@@ -360,8 +360,7 @@ public static function login_page() {
 ';
    }
 public static function configuration() {
-   $stx='style="white-space:nowrap;"';
-   $sty='style="padding-left:20px;"';
+   #   read and save the configuration parameters
    #
    # --- read in the configuration parameters
    $conf_forb_id   =rex_config::get('access_control','cat_forbidden_id');
@@ -415,37 +414,37 @@ public static function configuration() {
    echo '<div>'.rex_i18n::msg("access_control_settings_first").'</div>
 <br/>
 <form method="post">
-<table style="background-color:inherit;">
+<table class="access_control_table">
     <tr><td colspan="3">
             '.rex_i18n::msg("access_control_settings_par1").'</td></tr>
-    <tr><td '.$stx.'></td>
-        <td '.$sty.'><small>'.rex_i18n::msg("access_control_settings_col12").'</small></td>
-        <td '.$sty.'><small>'.rex_i18n::msg("access_control_settings_col13").'</small></td></tr>
-    <tr><td '.$stx.'>'.rex_i18n::msg("access_control_settings_col21").':</td>
-        <td '.$sty.'>'.$input_prot_id.'</td>
-        <td '.$sty.'>'.rex_i18n::msg("access_control_settings_col23").'</td></tr>
-    <tr><td '.$stx.'>'.rex_i18n::msg("access_control_settings_col31").':</td>
-        <td '.$sty.'>'.$input_protmed_id.'</td>
-        <td '.$sty.'>'.rex_i18n::msg("access_control_settings_col33").'</td></tr>
-    <tr><td '.$stx.'>'.rex_i18n::msg("access_control_settings_col41").' (*):</td>
-        <td '.$sty.'>'.$input_forb_id.'</td>
-        <td '.$sty.'>'.rex_i18n::msg("access_control_settings_col43").'</td></tr>
+    <tr><td class="access_control_nowrap"></td>
+        <td class="access_control_indent"><small>'.rex_i18n::msg("access_control_settings_col12").'</small></td>
+        <td class="access_control_indent"><small>'.rex_i18n::msg("access_control_settings_col13").'</small></td></tr>
+    <tr><td class="access_control_nowrap">'.rex_i18n::msg("access_control_settings_col21").':</td>
+        <td class="access_control_indent">'.$input_prot_id.'</td>
+        <td class="access_control_indent">'.rex_i18n::msg("access_control_settings_col23").'</td></tr>
+    <tr><td class="access_control_nowrap">'.rex_i18n::msg("access_control_settings_col31").':</td>
+        <td class="access_control_indent">'.$input_protmed_id.'</td>
+        <td class="access_control_indent">'.rex_i18n::msg("access_control_settings_col33").'</td></tr>
+    <tr><td class="access_control_nowrap">'.rex_i18n::msg("access_control_settings_col41").' (*):</td>
+        <td class="access_control_indent">'.$input_forb_id.'</td>
+        <td class="access_control_indent">'.rex_i18n::msg("access_control_settings_col43").'</td></tr>
     <tr><td></td>
-        <td colspan="2" '.$sty.'>
+        <td colspan="2" class="access_control_indent">
             (*)<small> &nbsp; '.rex_i18n::msg("access_control_settings_col52").'</small></td></tr>';
    #
    # --- access data for the member user
    echo '
     <tr><td colspan="3"><br/>
             '.rex_i18n::msg("access_control_settings_par2").'</td></tr>
-    <tr><td '.$stx.'>'.rex_i18n::msg("access_control_settings_user").':</td>
-        <td '.$sty.'>'.$input_memb_login.'</td>
-        <td '.$sty.'></td></tr>
-    <tr><td '.$stx.'>'.rex_i18n::msg("access_control_settings_pwd").':</td>
-        <td '.$sty.'>'.$input_memb_pwd.'</td>
-        <td '.$sty.'></td></tr>
-    <tr><td '.$sty.'></td>
-        <td '.$sty.' colspan="2"><br/>
+    <tr><td class="access_control_nowrap">'.rex_i18n::msg("access_control_settings_user").':</td>
+        <td class="access_control_indent">'.$input_memb_login.'</td>
+        <td class="access_control_indent"></td></tr>
+    <tr><td class="access_control_nowrap">'.rex_i18n::msg("access_control_settings_pwd").':</td>
+        <td class="access_control_indent">'.$input_memb_pwd.'</td>
+        <td class="access_control_indent"></td></tr>
+    <tr><td></td>
+        <td class="access_control_indent" colspan="2"><br/>
             <button class="btn btn-save" type="submit" name="sendit" value="sendit"
                     title="'.rex_i18n::msg("access_control_settings_title").'">'.
             rex_i18n::msg("access_control_settings_text").'</button></td></tr>
