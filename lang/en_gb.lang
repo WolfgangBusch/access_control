@@ -28,6 +28,7 @@ access_control_details_par2c  = 1: Page is located in the protected area, the vi
 access_control_details_par2d  = 2: Page is located in the forbidden area, the visitor is <b>not</b> authenticated as site administrator
 access_control_details_temp   = This is a PHP code snippet as part of the page template in order to possibly display a corresponding error message instead of the article content
 #   documentation settings
+access_control_settings_first = The following data are stored as Redaxo configuration parameters and will be removed by de-installation of the AddOn, only.
 access_control_settings_par1  = <b>Selection of a categorie or a media categorie to be protected:</b><br/>Within and below all articles/files are visible only after authorization has been given.<br/>Make every selection independently. If you omit one of the selections you will miss the related protection.
 access_control_settings_col12 = category or media category choosen
 access_control_settings_col13 = Selection by
