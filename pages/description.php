@@ -5,16 +5,15 @@
  * @package redaxo5
  * @version März 2019
 */
-$sty='style="padding-left:20px;"';
 echo '<div><b>'.rex_i18n::msg("access_control_descr_head1").':</b></div>
-<div '.$sty.'>'.rex_i18n::msg("access_control_descr_par1").'</div>
+<div class="access_control_indent">'.rex_i18n::msg("access_control_descr_par1").'</div>
 
 <div><br/><b>'.rex_i18n::msg("access_control_descr_head2").':</b></div>
-<div '.$sty.'>'.rex_i18n::msg("access_control_descr_par2").'</div>
+<div class="access_control_indent">'.rex_i18n::msg("access_control_descr_par2").'</div>
 
 <div><br/><b>'.rex_i18n::msg("access_control_descr_head3").':</b></div>
-<div '.$sty.'>'.rex_i18n::msg("access_control_descr_par3").'</div>
+<div class="access_control_indent">'.rex_i18n::msg("access_control_descr_par3").'</div>
 
 <div><br/><b>'.rex_i18n::msg("access_control_descr_head4").':</b></div>
-<div '.$sty.'>'.rex_i18n::msg("access_control_descr_par4").'</div>';
+<div class="access_control_indent">'.rex_i18n::msg("access_control_descr_par4").'</div>';
 ?>
