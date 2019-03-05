@@ -1,7 +1,8 @@
 # access_control
 <h4>Version 1.6.2</h4>
 <ul>
-    <li>Verbesserung der Dokumentation im Bereich der Konfiguration.</li>
+    <li>Verbesserung der Dokumentation im Bereich der Konfiguration und
+        Verlegung aller Styles in die Stylesheet-Datei.</li>
 </ul>
 <h4>Version 1.6.1</h4>
 <ul>
