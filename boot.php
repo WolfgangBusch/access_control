@@ -15,4 +15,9 @@ if(!empty($file)) access_control::print_file($file,'');   // display it
 $file=rex_get('rex_media_file','string');
 $type=rex_get('rex_media_type','string');
 if(!empty($file)) access_control::print_file($file,$type);   // display it
+#
+# --- include the stylesheet file in backend, too
+$my_package=$this->getPackageId();
+$file=rex_url::addonAssets($my_package).$my_package.'.css';
+rex_view::addCssFile($file);
 ?>
