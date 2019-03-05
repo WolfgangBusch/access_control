@@ -7,5 +7,5 @@
  */
 #
 # --- remove the configurated data
-rex_config::removeNamespace('access_control');
+rex_config::removeNamespace($this->getPackageId());
 ?>
