@@ -48,6 +48,7 @@ public static function build_module($mypackage) {
    #   $mypackage          package name
    #   functions used:
    #      self::define_module($mypackage)
+   #      self::sql_action($sql,$query)
    #
    $table='rex_module';
    #
@@ -64,11 +65,11 @@ public static function build_module($mypackage) {
    if(!empty($mod)):
      #     existing:         update (name unchanged)
      $id=$mod[0]['id'];
-     counter_sql_action($sql,'UPDATE '.$table.' SET  input=\''.$input.'\'  WHERE id='.$id);
-     counter_sql_action($sql,'UPDATE '.$table.' SET output=\''.$output.'\' WHERE id='.$id);
+     self::sql_action($sql,'UPDATE '.$table.' SET  input=\''.$input.'\'  WHERE id='.$id);
+     self::sql_action($sql,'UPDATE '.$table.' SET output=\''.$output.'\' WHERE id='.$id);
      else:
      #     not yet existing: insert
-     counter_sql_action($sql,'INSERT INTO '.$table.' (name,input,output) '.
+     self::sql_action($sql,'INSERT INTO '.$table.' (name,input,output) '.
         'VALUES (\''.$name.'\',\''.$input.'\',\''.$output.'\')');
      endif;
    }
