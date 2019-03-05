@@ -1,4 +1,8 @@
 # access_control
+<h4>Version 1.6.1</h4>
+<ul>
+    <li>Ein dummer Fehler im Installations-Script ist behoben.</li>
+</ul>
 <h4>Version 1.6.0</h4>
 <ul>
     <li>Der gesamte Source-Code ist jetzt auf UTF-8 umgestellt.</li>
