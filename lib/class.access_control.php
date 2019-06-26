@@ -221,6 +221,13 @@ public static function print_file($file,$media_type) {
    #      rex_response::sendFile($file,$contentType,$contentDisposition)
    #
    $medfile=rex_path::media($file);
+   if(empty($file) or !file_exists($medfile)):
+     $errfile=rex_path::addon('media_manager', 'media/warning.jpg');
+     $managed_media=new rex_managed_media($errfile);
+     $manager=new rex_media_manager($managed_media);
+     $manager->sendMedia();
+     endif;
+   #
    $auth=self::user_logged_in();
    if(self::media2protect($file) and
       empty($auth['redaxo']) and empty($auth['session'])):
@@ -231,7 +238,8 @@ public static function print_file($file,$media_type) {
      $manager->sendMedia();
      else:
      $mtype=mime_content_type($medfile);
-     if(substr($mtype,0,5)=='image' or $mtype=='text/plain' or $mtype=='application/pdf'):
+     if(substr($mtype,0,5)=='image' or $mtype=='text/plain' or
+        $mtype=='application/pdf' or $mtype=='directory'):
        #     images and pdf displayed by sendMedia()
        if(!empty($media_type)):
          $counter=rex_media_manager::deleteCache($file,$media_type);
