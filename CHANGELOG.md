@@ -1,4 +1,14 @@
 # access_control
+<h4>Version 1.7</h4>
+<ul>
+    <li>Verzicht auf eine eigene Funktion 'sendFile', stattdessen wird
+        'rex_response::sendFile' verwendet.</li>
+    <li>Parameter- und CSS-Klassennamen werden jetzt als benannte
+        Konstanten abgelegt.</li>
+    <li>Im Login-Formular und im Modul werden die sprachabhängigen
+        Texte jetzt anhand der Sprach-Id ausgewählt, nicht mehr
+        anhand des Sprach-Codes.</li>
+</ul>
 <h4>Version 1.6.2</h4>
 <ul>
     <li>Verbesserung der Dokumentation im Bereich der Konfiguration und
