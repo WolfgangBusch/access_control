@@ -6,7 +6,7 @@ access_control_description  = Description
 access_control_settings     = Settings
 access_control_details      = Details
 #   documentation help
-access_control_help           = This AddOn offers access control on sectors of articles or media files, respectively. It is designed completely bilingual (german, english).<br/>The authorization for access is given after successful authentification.<br/>Only one simple rewrite rule is required.
+access_control_help           = This AddOn offers access control on sectors of articles or media files, respectively.<br/>The authorization for access requires the specification of name and password of a community user and is stored in a session variable.<br/>Only one simple rewrite rule is required.<br/>The AddOn is designed completely bilingual (german, english).
 #   documentation description
 access_control_descr_head1    = Protected area
 access_control_descr_par1     = It is possible to protect all articles and all media files located in the path below a special category or media category, respectively. Appropriate categories are to be set on the configuration page. It is no limitation to provide exactly one protected category and one protected media category ("protected area"), because every article and every media file can be protected by moving it properly.
@@ -15,7 +15,7 @@ access_control_descr_par2     = The AddOn provides a module for displaying a sig
 access_control_descr_head3    = Forbidden area
 access_control_descr_par3     = Furthermore the site administrator can set a category in the configuration below which only he can view articles as soon as he is logged in ("forbidden area").
 access_control_descr_head4    = Access authorization check
-access_control_descr_par4     = In the absence of access authorization, an error image will automatically be displayed instead of the requested media file. Checking whether a requested article is free, protected or forbidden can be done by using an AddOn function, meaningfully in the page template. At this place a corresponding error message can be displayed instead of the article content.
+access_control_descr_par4     = In the absence of access authorization, an error image will automatically be displayed instead of the requested media file. Checking whether a requested article is public, protected or forbidden can be done by using an AddOn function, meaningfully in the page template. At this place a corresponding error message can be displayed instead of the article content.
 #   documentation details
 access_control_details_head1  = Rewriting of media files
 access_control_details_par1a  = Usually a media file address in a picture reference or an article reference is written down in one of the following formats
@@ -39,7 +39,7 @@ access_control_settings_col33 = any file of the media category
 access_control_settings_col41 = forbidden
 access_control_settings_col43 = category main article
 access_control_settings_col52 = visible for authenticated site administrator only
-access_control_settings_par2  = <b>Member user's access data:</b><br/>Nobody else (accept authenticated editors) are allowed to access protected articles and media files.<br/>If the Community AddOn should be used for authentication this data does not have to be entered.
+access_control_settings_par2  = <b>Member user's access data:</b><br/>Nobody else (accept authenticated editors) are allowed to access protected articles and media files.
 access_control_settings_user  = User name
 access_control_settings_pwd   = Password
 access_control_settings_title = save choosen parameters
