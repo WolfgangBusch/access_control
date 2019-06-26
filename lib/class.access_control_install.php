@@ -3,7 +3,7 @@
  * Access Control AddOn
  * @author wolfgang[at]busch-dettum[dot]de Wolfgang Busch
  * @package redaxo5
- * @version März 2019
+ * @version Juni 2019
  */
 #
 class access_control_install {
@@ -32,11 +32,11 @@ public static function define_module($mypackage) {
    $name='Member Login ('.$mypackage.')';
    $in='<?php
 $clang_id=rex_clang::getCurrentId();
-$clang_code=rex_clang::get($clang_id)->getCode();
-if($clang_code=="de")
+if($clang_id==1):
   echo "<p>Anzeige einer Login-Seite zur Authentifizierung als Mitglieds-Benutzer</p>\n";
-if($clang_code=="en")
+  else:
   echo "<p>Displaying a login page for authentication as member user</p>\n";
+  endif;
 ?>';
    $out='<?php
 access_control::login_page();

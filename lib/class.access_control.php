@@ -3,8 +3,23 @@
  * Access Control AddOn
  * @author wolfgang[at]busch-dettum[dot]de Wolfgang Busch
  * @package redaxo5
- * @version März 2019
+ * @version Juni 2019
  */
+#
+define('CONTROL',          $this->getPackageId()); // Package-Id
+define('CAT_PROTECTED',    'cat_protected_id');
+define('CAT_FORBIDDEN',    'cat_forbidden_id');
+define('MEDCAT_PROTECTED', 'medcat_protected_id');
+define('MEMBER_LOGIN',     'member_login');
+define('MEMBER_PASSWORD',  'member_password');
+define('CLASS_ERROR',      'access_control_error');    // css class names
+define('CLASS_SUCCESS',    'access_control_success');
+define('CLASS_FRAME',      'access_control_frame');
+define('CLASS_WIDTH',      'access_control_width');
+define('CLASS_TABLE',      'access_control_table');
+define('CLASS_INDENT',     'access_control_indent');
+define('CLASS_NOWRAP',     'access_control_nowrap');
+
 #
 class access_control {
 #
@@ -25,29 +40,28 @@ public static function member_session($func) {
    #      'pwd'   return the member user's password (as configurated)
    #              return '', if not configured
    #
-   $member_login   =rex_config::get('access_control','member_login');
-   $member_password=rex_config::get('access_control','member_password');
+   $member_login   =rex_config::get(CONTROL,MEMBER_LOGIN);
+   $member_password=rex_config::get(CONTROL,MEMBER_PASSWORD);
    #
    # --- not configured
    if(empty($member_login) or empty($member_password)) return;
-   $instname=rex::getProperty('instname');
-   $system_id=rex_backend_login::SYSTEM_ID;
    #
    # --- set session variable
    if($func=='set'):
-     $_SESSION[$instname][$system_id]['MEMBER_LOGIN']=$member_login;
+     if(session_status()!=PHP_SESSION_ACTIVE) session_start();
+     $_SESSION[CONTROL]=$member_login;
      return;
      endif;
    # --- empty session variable
    if($func=='end'):
-     $_SESSION[$instname][$system_id]['MEMBER_LOGIN']='';
+     $_SESSION[CONTROL]='';
      return;
      endif;
    #
    # --- return member user's user name if he is logged in
    if($func=='get'):
-     if(!empty($_SESSION[$instname][$system_id]['MEMBER_LOGIN'])):
-       return $_SESSION[$instname][$system_id]['MEMBER_LOGIN'];
+     if(!empty($_SESSION[CONTROL])):
+       return $_SESSION[CONTROL];
        else:
        return;
        endif;
@@ -58,7 +72,7 @@ public static function member_session($func) {
    if($func=='pwd')  return $member_password;
    }
 public static function get_rex_editor() {
-   #   returns die Redaxo editor's user name, if he is logged in
+   #   returns the Redaxo editor's user name, if he is logged in
    #   (or '' if not)
    #
    $user='';
@@ -69,8 +83,8 @@ public static function get_rex_editor() {
    return $user;
    }
 public static function user_logged_in() {
-   #   check if the visitor is logged in one of the following user:
-   #   as Redaxo editor or as member user,
+   #   check if the visitor is logged in:
+   #   as Redaxo editor and/or as member user,
    #   return an associative array containing:
    #      $auth['redaxo']  = Redaxo editor's user name (or '')
    #      $auth['session'] = member's user name (or '')
@@ -89,6 +103,7 @@ public static function user_logged_in() {
 public static function protected_or_forbidden() {
    #   determine if access to the current article needs to be denied,
    #   return value:
+   #      0, if access is allowed
    #      1, if the article is located in the protected area and the
    #         visitor is not authenticated
    #      2, if the article is located in the forbidden area and the
@@ -111,8 +126,8 @@ public static function protected_or_forbidden() {
    #        endif;
    #      ...
    #
-   $rc=0;
    $art=rex_article::getCurrent();
+   $rc=0;
    if(self::no_access($art,1)<=0) $rc=1;  // protected area
    if(self::no_access($art,2)<=0) $rc=2;  // forbidden area
    return $rc;
@@ -124,21 +139,21 @@ public static function no_access($art,$kont) {
    #   $kont              <=1: proof the access on the protected area
    #                      >=2: proof the access on the forbidden area
    #   return value:
-   #      1: no protected/forbidden area is configured
+   #      1: protected/forbidden area not configured
    #      2: the article is not located in the protected/forbidden area
    #      3: the article is located in the protected/forbidden area,
    #         but the visitor is authenticated as authorized user
    #      0: the article is located in the protected/forbidden area,
-   #         and the visitor is not authenticated as authorized user
+   #         and the visitor is not authenticated as authorized user,
    #         access is to be denied
    #   used functions:
    #      self::user_logged_in()
    #
    $rc=1;
    if($kont<=1):
-     $cat_id=rex_config::get('access_control','cat_protected_id');
+     $cat_id=rex_config::get(CONTROL,CAT_PROTECTED);
      else:
-     $cat_id=rex_config::get('access_control','cat_forbidden_id');
+     $cat_id=rex_config::get(CONTROL,CAT_FORBIDDEN);
      endif;
    if(!empty($cat_id)):
      #
@@ -175,7 +190,7 @@ public static function media2protect($file) {
    #      FALSE, otherwise, or no protected category is configurated
    #   $file              given media file (relative file name)
    #
-   $medcat_protected_id=rex_config::get('access_control','medcat_protected_id');
+   $medcat_protected_id=rex_config::get(CONTROL,MEDCAT_PROTECTED);
    if(empty($medcat_protected_id)) return FALSE;
    $media=rex_media::get($file);
    #
@@ -194,44 +209,23 @@ public static function media2protect($file) {
    if($catid==$medcat_protected_id) return TRUE;
    return FALSE;
    }
-public static function sendFile($file,$contentType,$contentDispos) {
-   #   modified Redaxo rex_response::sendFile(...) to download files
-   #   this version always delivers the original file content, no cache is used
-   #   $file              given media file (absolute file name)
-   #   $contentType       content mime type of the given file
-   #   $contentDispos     content disposition of the given file
-   #   used functions:
-   #      rex_response::cleanOutputBuffers()
-   #      rex_response::sendContentType($contentType)
-   #
-   rex_response::cleanOutputBuffers();
-   #     prevent session locking while sending huge files
-   session_write_close();
-   #     send content characteristics
-   rex_response::sendContentType($contentType);
-   header('Content-Disposition: '.$contentDispos.'; filename="'.basename($file).'"');
-   if(!ini_get('zlib.output_compression'))
-     header('Content-Length: '.filesize($file));
-   readfile($file);
-   }
-public static function print_file($file,$type) {
+public static function print_file($file,$media_type) {
    #   displaying a media file, if no access is allowed a general error
    #   file ('protected.gif') is displayed instead
    #   $file              given media file (relative file name)
-   #   $type              given media type
+   #   $media_type        given media type
    #   used functions:
    #      self::user_logged_in()
    #      self::media2protect($file)
-   #      self::sendFile($medfile,$type,$contentDispos)
+   #      rex_media_manager::sendMedia()
+   #      rex_response::sendFile($file,$contentType,$contentDisposition)
    #
    $medfile=rex_path::media($file);
-   if(rex::isBackend() or empty($file) or !file_exists($medfile)) return;
-   #
    $auth=self::user_logged_in();
    if(self::media2protect($file) and
       empty($auth['redaxo']) and empty($auth['session'])):
      #     error file displayed
-     $errfile=rex_path::addonAssets('access_control','protected.gif');
+     $errfile=rex_path::addonAssets(CONTROL,'protected.gif');
      $managed_media=new rex_managed_media($errfile);
      $manager=new rex_media_manager($managed_media);
      $manager->sendMedia();
@@ -239,9 +233,9 @@ public static function print_file($file,$type) {
      $mtype=mime_content_type($medfile);
      if(substr($mtype,0,5)=='image' or $mtype=='text/plain' or $mtype=='application/pdf'):
        #     images and pdf displayed by sendMedia()
-       if(!empty($type)):
-         $counter=rex_media_manager::deleteCache($file,$type);
-         $manager=rex_media_manager::create($type,$file);
+       if(!empty($media_type)):
+         $counter=rex_media_manager::deleteCache($file,$media_type);
+         $manager=rex_media_manager::create($media_type,$file);
          else:
          $managed_media=new rex_managed_media($medfile);
          $manager=new rex_media_manager($managed_media);
@@ -249,7 +243,7 @@ public static function print_file($file,$type) {
        $manager->sendMedia();
        else:
        #     files downloaded by sendFile(), accounting large files
-       self::sendFile($medfile,$mtype,'attachment');
+       rex_response::sendFile($medfile,$mtype,'attachment');
        endif;
      endif;
    }
@@ -263,11 +257,10 @@ public static function login_page() {
    #
    # --- 1 page source for 2 languages
    $clang_id=rex_clang::getCurrentId();
-   $clang_code=rex_clang::get($clang_id)->getCode();
    #
    # --- Backend
    if(rex::isBackend()):
-     if($clang_code=='de'):
+     if($clang_id==1):
        echo '<p>Anzeige einer Login-Seite zur Authentifizierung als Mitglieds-Benutzer</p>';
        else:
        echo '<p>Displaying a login page for authentication as member user</p>';
@@ -280,7 +273,7 @@ public static function login_page() {
    $mempwd=self::member_session('pwd');
    #
    # --- Language constants
-   if($clang_code=='de'):
+   if($clang_id==1):
      $st_conf ='Bitte zunächst den Mitglieds-Benutzer nebst Passwort konfigurieren!';
      $st_in_up='Bitte Benutzername und Passwort eingeben';
      $st_wr_u ='+++ falscher Benutzername';
@@ -291,8 +284,7 @@ public static function login_page() {
      $st_butt ='anmelden';
      $st_memb ='Benutzer';
      $st_auth ='erfolgreich eingeloggt';
-     endif;
-   if($clang_code=='en'):
+     else:
      $st_conf ='Configure the member user including password at first, please!';
      $st_in_up='Insert user name and password, please';
      $st_wr_u ='+++ wrong user name';
@@ -305,7 +297,7 @@ public static function login_page() {
      $st_auth ='logged in successfully';
      endif;
    if(empty($member) or empty($mempwd))
-     echo '<p class="access_control_error">'.$st_conf.'</p>';
+     echo '<p class="'.CLASS_ERROR.'">'.$st_conf.'</p>';
    #
    # --- get login name and password
    if(count($_POST)>0):
@@ -333,25 +325,25 @@ public static function login_page() {
      if($login!=$member)  $error=$st_wr_u;
      if(empty($login))    $error=$st_in_up;
      if(empty($error)):
-       $error='<p class="access_control_success">'.
+       $error='<p class="'.CLASS_SUCCESS.'">'.
           $st_memb.' \''.$member.'\' '.$st_auth.'</p>';
        # --- set login SESSION variable
        self::member_session('set');
        else:
-       $error='<p class="access_control_error">'.$error.'</p>';
+       $error='<p class="'.CLASS_ERROR.'">'.$error.'</p>';
        endif;
      endif;
    #
    # --- input form for user/password
    echo '
-<div class="access_control_indent"><div class="access_control_frame">
+<div class="'.CLASS_INDENT.'"><div class="'.CLASS_FRAME.'">
 '.$error.'
 <form method="post">
 <table>
     <tr><td>'.$st_user.': &nbsp;</td>
-        <td><input type="text" name="login" value="'.$login.'" class="form-control access_control_width" /></td></tr>
+        <td><input type="text" name="login" value="'.$login.'" class="form-control '.CLASS_WIDTH.'" /></td></tr>
     <tr><td>'.$st_pwd.':</td>
-        <td><input type="password" name="passwd" value="'.$passwd.'" class="form-control access_control_width" /></td></tr>
+        <td><input type="password" name="passwd" value="'.$passwd.'" class="form-control '.CLASS_WIDTH.'" /></td></tr>
     <tr><td>&nbsp;</td>
         <td><input class="form-control" type="submit" value="'.$st_butt.'" /></td></tr>
 </table>
@@ -363,14 +355,14 @@ public static function configuration() {
    #   read and save the configuration parameters
    #
    # --- read in the configuration parameters
-   $conf_forb_id   =rex_config::get('access_control','cat_forbidden_id');
-   $conf_prot_id   =rex_config::get('access_control','cat_protected_id');
-   $conf_protmed_id=rex_config::get('access_control','medcat_protected_id');
+   $conf_forb_id   =rex_config::get(CONTROL,CAT_FORBIDDEN);
+   $conf_prot_id   =rex_config::get(CONTROL,CAT_PROTECTED);
+   $conf_protmed_id=rex_config::get(CONTROL,MEDCAT_PROTECTED);
    if($conf_protmed_id=='0') $conf_protmed_id='';
-   $conf_memb_login=rex_config::get('access_control','member_login');
-   $conf_memb_pwd  =rex_config::get('access_control','member_password');
+   $conf_memb_login=rex_config::get(CONTROL,MEMBER_LOGIN);
+   $conf_memb_pwd  =rex_config::get(CONTROL,MEMBER_PASSWORD);
    #
-   if(empty($_POST['sendit'])):
+   if(empty($_POST['save'])):
      #
      # --- fill the configuration parameters into the form
      $forb_id   =$conf_forb_id;
@@ -392,60 +384,76 @@ public static function configuration() {
      $memb_pwd  =$_POST['memb_pwd'];
      #
      # --- save the new configuration parameters (after submit)
-     rex_config::set('access_control','cat_forbidden_id',   intval($forb_id));
-     rex_config::set('access_control','cat_protected_id',   intval($prot_id));
-     rex_config::set('access_control','medcat_protected_id',intval($protmed_id));
-     rex_config::set('access_control','member_login',       $memb_login);
-     rex_config::set('access_control','member_password',    $memb_pwd);
+     rex_config::set(CONTROL,CAT_FORBIDDEN,   intval($forb_id));
+     rex_config::set(CONTROL,CAT_PROTECTED,   intval($prot_id));
+     rex_config::set(CONTROL,MEDCAT_PROTECTED,intval($protmed_id));
+     rex_config::set(CONTROL,MEMBER_LOGIN,    $memb_login);
+     rex_config::set(CONTROL,MEMBER_PASSWORD, $memb_pwd);
      endif;
    #
    # --- define input buttons and fields
-   $input_forb_id   =rex_var_link::getWidget(1,'forb_id',$forb_id);
-   $input_prot_id   =rex_var_link::getWidget(2,'prot_id',$prot_id);
+   $input_forb_id   =rex_var_link::getWidget (1,'forb_id',   $forb_id);
+   $input_prot_id   =rex_var_link::getWidget (2,'prot_id',   $prot_id);
    $input_protmed_id=rex_var_media::getWidget(1,'protmed_id',$protmed_id);
+   #     the buttons HTML codes contain:
+   # <input type="hidden" name="forb_id" id="REX_LINK_1" value="***" />
+   # <input type="hidden" name="prot_id" id="REX_LINK_2" value="***" />
+   # <input class="form-control" type="text" name="protmed_id" value="***" id="REX_MEDIA_1" readonly />
    $input_memb_login='<input class="form-control" type="text" name="memb_login" value="'.$memb_login.'" />';
    $input_memb_pwd  ='<input class="form-control" type="password" name="memb_pwd" value="'.$memb_pwd.'" />';
-   ### the buttons HTML codes contain:
-   ### <input type="hidden" name="forb_id" id="REX_LINK_1" value="***" />
-   ### <input type="hidden" name="prot_id" id="REX_LINK_2" value="***" />
-   ### <input class="form-control" type="text" name="protmed_id" value="***" id="REX_MEDIA_1" readonly />
    #
    # --- protected categories and media categories
    echo '<div>'.rex_i18n::msg("access_control_settings_first").'</div>
 <br/>
 <form method="post">
-<table class="access_control_table">
+<table class="'.CLASS_TABLE.'">
     <tr><td colspan="3">
             '.rex_i18n::msg("access_control_settings_par1").'</td></tr>
-    <tr><td class="access_control_nowrap"></td>
-        <td class="access_control_indent"><small>'.rex_i18n::msg("access_control_settings_col12").'</small></td>
-        <td class="access_control_indent"><small>'.rex_i18n::msg("access_control_settings_col13").'</small></td></tr>
-    <tr><td class="access_control_nowrap">'.rex_i18n::msg("access_control_settings_col21").':</td>
-        <td class="access_control_indent">'.$input_prot_id.'</td>
-        <td class="access_control_indent">'.rex_i18n::msg("access_control_settings_col23").'</td></tr>
-    <tr><td class="access_control_nowrap">'.rex_i18n::msg("access_control_settings_col31").':</td>
-        <td class="access_control_indent">'.$input_protmed_id.'</td>
-        <td class="access_control_indent">'.rex_i18n::msg("access_control_settings_col33").'</td></tr>
-    <tr><td class="access_control_nowrap">'.rex_i18n::msg("access_control_settings_col41").' (*):</td>
-        <td class="access_control_indent">'.$input_forb_id.'</td>
-        <td class="access_control_indent">'.rex_i18n::msg("access_control_settings_col43").'</td></tr>
+    <tr><td class="'.CLASS_NOWRAP.'"></td>
+        <td class="'.CLASS_INDENT.'"><small>
+            '.rex_i18n::msg("access_control_settings_col12").'</small></td>
+        <td class="'.CLASS_INDENT.'"><small>
+            '.rex_i18n::msg("access_control_settings_col13").'</small></td></tr>
+    <tr><td class="'.CLASS_NOWRAP.'">
+            '.rex_i18n::msg("access_control_settings_col21").':</td>
+        <td class="'.CLASS_INDENT.'">
+            '.$input_prot_id.'</td>
+        <td class="'.CLASS_INDENT.'">
+            '.rex_i18n::msg("access_control_settings_col23").'</td></tr>
+    <tr><td class="'.CLASS_NOWRAP.'">
+            '.rex_i18n::msg("access_control_settings_col31").':</td>
+        <td class="'.CLASS_INDENT.'">
+            '.$input_protmed_id.'</td>
+        <td class="'.CLASS_INDENT.'">
+            '.rex_i18n::msg("access_control_settings_col33").'</td></tr>
+    <tr><td class="'.CLASS_NOWRAP.'">
+            '.rex_i18n::msg("access_control_settings_col41").' (*):</td>
+        <td class="'.CLASS_INDENT.'">
+            '.$input_forb_id.'</td>
+        <td class="'.CLASS_INDENT.'">
+            '.rex_i18n::msg("access_control_settings_col43").'</td></tr>
     <tr><td></td>
-        <td colspan="2" class="access_control_indent">
-            (*)<small> &nbsp; '.rex_i18n::msg("access_control_settings_col52").'</small></td></tr>';
+        <td colspan="2" class="'.CLASS_INDENT.'">
+            (*)<small> &nbsp; '.
+              rex_i18n::msg("access_control_settings_col52").'</small></td></tr>';
    #
    # --- access data for the member user
    echo '
     <tr><td colspan="3"><br/>
             '.rex_i18n::msg("access_control_settings_par2").'</td></tr>
-    <tr><td class="access_control_nowrap">'.rex_i18n::msg("access_control_settings_user").':</td>
-        <td class="access_control_indent">'.$input_memb_login.'</td>
-        <td class="access_control_indent"></td></tr>
-    <tr><td class="access_control_nowrap">'.rex_i18n::msg("access_control_settings_pwd").':</td>
-        <td class="access_control_indent">'.$input_memb_pwd.'</td>
-        <td class="access_control_indent"></td></tr>
+    <tr><td class="'.CLASS_NOWRAP.'">
+            '.rex_i18n::msg("access_control_settings_user").':</td>
+        <td class="'.CLASS_INDENT.'">
+            '.$input_memb_login.'</td>
+        <td class="'.CLASS_INDENT.'"></td></tr>
+    <tr><td class="'.CLASS_NOWRAP.'">
+            '.rex_i18n::msg("access_control_settings_pwd").':</td>
+        <td class="'.CLASS_INDENT.'">
+            '.$input_memb_pwd.'</td>
+        <td class="'.CLASS_INDENT.'"></td></tr>
     <tr><td></td>
-        <td class="access_control_indent" colspan="2"><br/>
-            <button class="btn btn-save" type="submit" name="sendit" value="sendit"
+        <td class="'.CLASS_INDENT.'" colspan="2"><br/>
+            <button class="btn btn-save" type="submit" name="save" value="save"
                     title="'.rex_i18n::msg("access_control_settings_title").'">'.
             rex_i18n::msg("access_control_settings_text").'</button></td></tr>
 </table>
