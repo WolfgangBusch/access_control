@@ -2,44 +2,25 @@
 <h3>Zugriffsschutz für Artikel und Mediendateien</h3>
 
 <div>Dieses AddOn ermöglicht einen Zugriffsschutz für ausgewählte
-Bereiche von Artikeln beziehungsweise Mediendateien. Es ist
-komplett zweisprachig eingerichtet (deutsch, englisch).<br/>
-Eine Autorisierung für den Zugriff erfolgt nach erfolgreicher
-Authentifizierung.<br/>
-Es ist nur eine einfache Rewrite-Regel erforderlich.</div>
+Bereiche von Artikeln beziehungsweise Mediendateien.</div>
+<div>Die Autorisierung für den Zugriff erfordert die Eingabe
+von Name und Passwort eines Gemeinschafts-Benutzers und wird
+in einer Session-Variablen abgelegt.</div>
+<div>Es ist nur eine einfache Rewrite-Regel erforderlich.</div>
+<div>Das AddOn ist komplett zweisprachig eingerichtet (deutsch,
+englisch).</div>
 
-<div><br/><b>Geschützter Bereich:</b></div>
-<div>Geschützt werden können alle Artikel und Mediendateien
-im Pfad unterhalb einer speziellen Kategorie bzw. Medienkategorie.
-Entsprechende Kategorien werden in der Konfiguration festgelegt.
-Es bedeutet keine Einschränkung, nur genau eine geschützte
-Kategorie bzw. Medienkategorie ("geschützter Bereich") vorzusehen,
-weil jeder Artikel und jede Mediendatei durch geeignetes
-Verschieben geschützt werden kann.</div>
+<div><br/><b>Geschützte Bereiche:</b></div>
+<div>Es kann jeweils eine Kategorie und eine Medienkategorie
+konfiguriert werden, in der (und im Pfad unterhalb) ein
+Zugriff nur nach Authentifizierung möglich ist. Artikel bzw.
+Mediendateien können durch Verschieben jederzeit auch
+nachträglich geschützt werden.</div>
 
 <div><br/><b>Gemeinschafts-Benutzer:</b></div>
-<div>Das AddOn bietet einen Modul für ein LogIn-Formular an,
-mit dem Besucher sich für den Zugriff auf geschützte Bereiche
-authentifizieren können. Ein entsprechender Benutzername
-und das zugehörige Passwort können konfiguriert werden.
-Durch Kenntnis dieser Zugangsdaten wird der Besucher zum
-Mitglied einer Gemeinschaft.<br/>
-Das LogIn ist Session-basiert.<br/>
-Ein eingeloggter Redaxo-Redakteur ist immer entsprechend
-zugriffsberechtigt.</div>
-
-<div><br/><b>Verbotener Bereich:</b></div>
-<div>Der Site-Administrator kann darüber hinaus in der
-Konfiguration eine Kategorie festlegen, unterhalb der nur
-er allein Artikel ansehen kann, sobald er eingeloggt ist
-("verbotener Bereich").</div>
-
-<div><br/><b>Überprüfung der Zugriffsberechtigung:</b></div>
-<div>Bei fehlender Zugriffsberechtigung wird anstelle
-der angeforderten Mediendatei automatisch ein Fehlerbild
-angezeigt. Die Überprüfung, ob ein angeforderter Artikel
-frei, geschützt oder verboten ist, kann mithilfe einer
-AddOn-Funktion vorgenommen werden, sinnvollerweise im
-Seiten-Template. An dieser Stelle kann eine entsprechende
-Fehlermeldung anstelle des Artikelinhalts angezeigt
-werden.</div>
+<div>Das AddOn bietet einen Modul für ein LogIn-Formular
+an, in dem Besucher die Zugangsdaten für den Zugriff auf
+geschützte Bereiche eingeben können. Sie werden durch Kenntnis
+dieser Zugangsdaten zu Mitgliedern einer Gemeinschaft.<br/>
+Ein eingeloggter Redaxo-Redakteur ist auch ohne LogIn immer
+entsprechend zugriffsberechtigt.</div>
