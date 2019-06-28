@@ -15,7 +15,7 @@ access_control_descr_par2     = Das AddOn bietet einen Modul für ein LogIn-Form
 access_control_descr_head3    = Verbotener Bereich
 access_control_descr_par3     = Der Site-Administrator kann darüber hinaus in der Konfiguration eine Kategorie festlegen, unterhalb der nur er allein Artikel ansehen kann, sobald er eingeloggt ist ("verbotener Bereich").
 access_control_descr_head4    = Überprüfung der Zugriffsberechtigung
-access_control_descr_par4     = Bei fehlender Zugriffsberechtigung wird anstelle der angeforderten Mediendatei automatisch ein Fehlerbild angezeigt. Die Überprüfung, ob ein angeforderter Artikel frei, geschützt oder verboten ist, kann mithilfe einer AddOn-Funktion vorgenommen werden, sinnvollerweise im Seiten-Template. An dieser Stelle kann eine entsprechende Fehlermeldung anstelle des Artikelinhalts angezeigt werden.
+access_control_descr_par4     = Bei fehlender Zugriffsberechtigung wird anstelle der angeforderten Mediendatei automatisch ein Fehlerbild angezeigt. Die Überprüfung, ob ein angeforderter Artikel öffentlich, geschützt oder verboten ist, kann mithilfe einer AddOn-Funktion vorgenommen werden, sinnvollerweise im Seiten-Template. An dieser Stelle kann eine entsprechende Fehlermeldung anstelle des Artikelinhalts angezeigt werden.
 #   documentation details
 access_control_details_head1  = Adressumleitung der Mediendateien
 access_control_details_par1a  = Standardmäßig wird eine Mediendatei in einer der beiden folgenden Formen in einer Bild- oder Artikel-Referenz adressiert
