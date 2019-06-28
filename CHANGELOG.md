@@ -5,9 +5,12 @@
         'rex_response::sendFile' verwendet.</li>
     <li>Parameter- und CSS-Klassennamen werden jetzt als benannte
         Konstanten abgelegt.</li>
-    <li>Im Login-Formular und im Modul werden die sprachabhängigen
+    <li>Im LogIn-Formular und im Modul werden die sprachabhängigen
         Texte jetzt anhand der Sprach-Id ausgewählt, nicht mehr
-        anhand des Sprach-Codes.</li>
+        anhand des Sprach-Codes. Außerdem wird nach erfolgreicher
+        Authentifizierung ein Abmelde-Button angezeigt.</li>
+    <li>Anstatt leerer oder nicht vorhandener Media-Dateien wird die
+        Datei 'warning.jpg' des AddOns media_manager angezeigt.</li>
 </ul>
 <h4>Version 1.6.2</h4>
 <ul>
