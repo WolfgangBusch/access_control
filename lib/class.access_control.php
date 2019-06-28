@@ -6,34 +6,28 @@
  * @version Juni 2019
  */
 #
-define('CONTROL',          $this->getPackageId()); // Package-Id
+define('CONTROL',          $this->getPackageId());  // Package-Id
 define('CAT_PROTECTED',    'cat_protected_id');
 define('CAT_FORBIDDEN',    'cat_forbidden_id');
 define('MEDCAT_PROTECTED', 'medcat_protected_id');
 define('MEMBER_LOGIN',     'member_login');
 define('MEMBER_PASSWORD',  'member_password');
-define('CLASS_ERROR',      'access_control_error');    // css class names
-define('CLASS_SUCCESS',    'access_control_success');
-define('CLASS_FRAME',      'access_control_frame');
-define('CLASS_WIDTH',      'access_control_width');
-define('CLASS_TABLE',      'access_control_table');
-define('CLASS_INDENT',     'access_control_indent');
+define('CLASS_INDENT',     'access_control_indent');  // CSS classes
 define('CLASS_NOWRAP',     'access_control_nowrap');
-
 #
 class access_control {
 #
 public static function member_session($func) {
    #   Returning different values depending on the value of $func
    #   $func=
-   #      'set'   authenticate (log in) the member user,
+   #      'set'   authenticate (sign in) the member user,
    #              i.e. set the appropriate session variable,
    #              return value ''
-   #      'end'   log out the member user,
+   #      'end'   sign off the member user,
    #              i.e. empty the appropriate session variable,
    #              return value ''
    #      'get'   return user name of the member user (= value of the
-   #              session variable, if he is logged in)
+   #              session variable, if he is authenticated)
    #              return value '' (otherwise)
    #      'name'  return the member user's user name (as configurated)
    #              return '', if not configured
@@ -58,7 +52,7 @@ public static function member_session($func) {
      return;
      endif;
    #
-   # --- return member user's user name if he is logged in
+   # --- return member user's user name if he is authenticated
    if($func=='get'):
      if(!empty($_SESSION[CONTROL])):
        return $_SESSION[CONTROL];
@@ -72,7 +66,7 @@ public static function member_session($func) {
    if($func=='pwd')  return $member_password;
    }
 public static function get_rex_editor() {
-   #   returns the Redaxo editor's user name, if he is logged in
+   #   returns the Redaxo editor's user name, if he is authenticated
    #   (or '' if not)
    #
    $user='';
@@ -82,8 +76,8 @@ public static function get_rex_editor() {
      endif;
    return $user;
    }
-public static function user_logged_in() {
-   #   check if the visitor is logged in:
+public static function user_authenticated() {
+   #   check if the visitor is authenticated:
    #   as Redaxo editor and/or as member user,
    #   return an associative array containing:
    #      $auth['redaxo']  = Redaxo editor's user name (or '')
@@ -147,7 +141,7 @@ public static function no_access($art,$kont) {
    #         and the visitor is not authenticated as authorized user,
    #         access is to be denied
    #   used functions:
-   #      self::user_logged_in()
+   #      self::user_authenticated()
    #
    $rc=1;
    if($kont<=1):
@@ -167,7 +161,7 @@ public static function no_access($art,$kont) {
      # --- article in protected / forbidden area, is the visitor authenticated?
      if($rc==3):
        if($kont<=1):
-         $auth=self::user_logged_in();
+         $auth=self::user_authenticated();
          if(empty($auth['redaxo']) and empty($auth['session'])):
            $rc=0;
            endif;
@@ -215,7 +209,7 @@ public static function print_file($file,$media_type) {
    #   $file              given media file (relative file name)
    #   $media_type        given media type
    #   used functions:
-   #      self::user_logged_in()
+   #      self::user_authenticated()
    #      self::media2protect($file)
    #      rex_media_manager::sendMedia()
    #      rex_response::sendFile($file,$contentType,$contentDisposition)
@@ -228,7 +222,7 @@ public static function print_file($file,$media_type) {
      $manager->sendMedia();
      endif;
    #
-   $auth=self::user_logged_in();
+   $auth=self::user_authenticated();
    if(self::media2protect($file) and
       empty($auth['redaxo']) and empty($auth['session'])):
      #     error file displayed
@@ -260,7 +254,7 @@ public static function login_page() {
    #   used functions:
    #      self::member_session('name');
    #      self::member_session('pwd');
-   #      self::user_logged_in();
+   #      self::user_authenticated();
    #      self::member_session('set');
    #
    # --- 1 page source for 2 languages
@@ -271,7 +265,7 @@ public static function login_page() {
      if($clang_id==1):
        echo '<p>Anzeige einer Login-Seite zur Authentifizierung als Mitglieds-Benutzer</p>';
        else:
-       echo '<p>Displaying a login page for authentication as member user</p>';
+       echo '<p>Displaying a sign in page for authentication as member user</p>';
        endif;
      return;
      endif;
@@ -290,6 +284,8 @@ public static function login_page() {
      $st_user ='Benutzername';
      $st_pwd  ='Passwort';
      $st_butt ='anmelden';
+     $st_butt2='abmelden';
+     $st_val2 ='abmelden';
      $st_memb ='Benutzer';
      $st_auth ='erfolgreich eingeloggt';
      else:
@@ -300,63 +296,65 @@ public static function login_page() {
      $st_wr_p ='+++ wrong password';
      $st_user ='User name';
      $st_pwd  ='Password';
-     $st_butt ='Sign in';
+     $st_butt ='sign in';
+     $st_butt2='sign off';
+     $st_val2 ='signoff';
      $st_memb ='User';
-     $st_auth ='logged in successfully';
+     $st_auth ='authenticated successfully';
      endif;
    if(empty($member) or empty($mempwd))
-     echo '<p class="'.CLASS_ERROR.'">'.$st_conf.'</p>';
+     echo '<p class="access_control_error">'.$st_conf.'</p>';
    #
-   # --- get login name and password
-   if(count($_POST)>0):
-     $login=$_POST['login'];
-     $passwd=$_POST['passwd'];
-     else:
-     $login='';
-     $passwd='';
-     endif;
+   # --- get login name and password ...
+   $login ='';
+   $passwd='';
+   if(!empty($_POST['login']))  $login =$_POST['login'];
+   if(!empty($_POST['passwd'])) $passwd=$_POST['passwd'];
    #
-   # --- already authenticated?
-   $loggedin=FALSE;
-   $auth=self::user_logged_in();
-   $user=$auth['session'];
+   # --- ... or sign off (delete session variable)
+   if(!empty($_POST['action'])) access_control::member_session('end');
+   #
+   # --- analysing the input values
    $error='';
-   if(!empty($user)):
-     $login=$user;
-     $passwd='';
-     $loggedin=TRUE;
-     else:
-     #
-     # --- analysing the input values
-     if($passwd!=$mempwd) $error=$st_wr_p;
-     if(empty($passwd))   $error=$st_in_p;
-     if($login!=$member)  $error=$st_wr_u;
-     if(empty($login))    $error=$st_in_up;
-     if(empty($error)):
-       $error='<p class="'.CLASS_SUCCESS.'">'.
-          $st_memb.' \''.$member.'\' '.$st_auth.'</p>';
-       # --- set login SESSION variable
-       self::member_session('set');
-       else:
-       $error='<p class="'.CLASS_ERROR.'">'.$error.'</p>';
-       endif;
-     endif;
+   if($passwd!=$mempwd) $error=$st_wr_p;
+   if(empty($passwd))   $error=$st_in_p;
+   if($login!=$member)  $error=$st_wr_u;
+   if(empty($login))    $error=$st_in_up;
    #
-   # --- input form for user/password
+   # --- display the form
    echo '
-<div class="'.CLASS_INDENT.'"><div class="'.CLASS_FRAME.'">
-'.$error.'
+<div class="access_control_frame">
 <form method="post">
-<table>
+<table>';
+   if(!empty($error)):
+     # --- sign in form
+     echo '
     <tr><td>'.$st_user.': &nbsp;</td>
-        <td><input type="text" name="login" value="'.$login.'" class="form-control '.CLASS_WIDTH.'" /></td></tr>
+        <td><input type="text" name="login" value="'.$login.'" class="access_control_input" /></td></tr>
     <tr><td>'.$st_pwd.':</td>
-        <td><input type="password" name="passwd" value="'.$passwd.'" class="form-control '.CLASS_WIDTH.'" /></td></tr>
-    <tr><td>&nbsp;</td>
-        <td><input class="form-control" type="submit" value="'.$st_butt.'" /></td></tr>
+        <td><input type="password" name="passwd" value="'.$passwd.'" class="access_control_input" /></td></tr>
+    <tr><td colspan=2">
+            <p class="access_control_error">'.$error.'</p></td>
+    <tr><td></td>
+        <td><button type="submit" name="action" value="">
+            '.$st_butt.'</button></td></tr>';
+     else:
+     # --- set session variable
+     if(empty($error)) self::member_session('set');
+     # --- sign off form
+     $success=$st_memb.' \''.$member.'\' '.$st_auth;
+     echo '
+    <tr><td><input type="hidden" name="login" value="" />
+            <input type="hidden" name="passwd" value="" /></td>
+        <td><p class="access_control_success">'.$success.'</p></td></tr>
+    <tr><td></td>
+        <td><button type="submit" name="action" value="'.$st_val2.'">
+            '.$st_butt2.'</button></td></tr>';
+     endif; 
+   echo '
 </table>
 </form>
-</div></div>
+</div>
 ';
    }
 public static function configuration() {
@@ -414,7 +412,7 @@ public static function configuration() {
    echo '<div>'.rex_i18n::msg("access_control_settings_first").'</div>
 <br/>
 <form method="post">
-<table class="'.CLASS_TABLE.'">
+<table class="access_control_table">
     <tr><td colspan="3">
             '.rex_i18n::msg("access_control_settings_par1").'</td></tr>
     <tr><td class="'.CLASS_NOWRAP.'"></td>
