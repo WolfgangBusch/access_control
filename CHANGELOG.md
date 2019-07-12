@@ -1,4 +1,12 @@
 # access_control
+<h4>Version 1.7.1</h4>
+<ul>
+    <li>Ergänzung für den Verweis auf eine Mediadatei in der Form
+        'index.php?rex_media_file=FILE&rex_media_type=TYPE'.
+        Die Datei wird auch gefunden und angezeigt, wenn sie außerhalb
+        des Ordners media liegt und TYPE über den Effekt mediapath
+        ('Datei: Pfad anpassen') den zugehörigen Ordner liefert.</li>
+</ul>
 <h4>Version 1.7</h4>
 <ul>
     <li>Verzicht auf eine eigene Funktion 'sendFile', stattdessen wird
