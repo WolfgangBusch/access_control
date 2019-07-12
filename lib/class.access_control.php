@@ -3,7 +3,7 @@
  * Access Control AddOn
  * @author wolfgang[at]busch-dettum[dot]de Wolfgang Busch
  * @package redaxo5
- * @version Juni 2019
+ * @version Juli 2019
  */
 #
 define('CONTROL',          $this->getPackageId());  // Package-Id
@@ -214,7 +214,11 @@ public static function print_file($file,$media_type) {
    #      rex_media_manager::sendMedia()
    #      rex_response::sendFile($file,$contentType,$contentDisposition)
    #
-   $medfile=rex_path::media($file);
+   ### $medfile=rex_path::media($file);  // wrong in case of media type 'mediapath'
+   $counter=rex_media_manager::deleteCache($file,$media_type);
+   @$manager=rex_media_manager::create($media_type,$file);
+   $media=$manager->getMedia();
+   $medfile=$media->getMediaPath();
    if(empty($file) or !file_exists($medfile)):
      $errfile=rex_path::addon('media_manager', 'media/warning.jpg');
      $managed_media=new rex_managed_media($errfile);
