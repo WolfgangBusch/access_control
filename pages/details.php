@@ -3,7 +3,7 @@
  * Access Control AddOn
  * @author wolfgang[at]busch-dettum[dot]de Wolfgang Busch
  * @package redaxo5
- * @version Juni 2019
+ * @version Juli 2019
 */
 echo '<div><b>'.rex_i18n::msg("access_control_details_head1").':</b>
 <code>RewriteRule</code></div>
