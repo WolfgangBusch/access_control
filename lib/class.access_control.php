@@ -24,7 +24,7 @@ public static function member_session($func) {
    #              i.e. set the appropriate session variable,
    #              return value ''
    #      'end'   sign off the member user,
-   #              i.e. empty the appropriate session variable,
+   #              i.e. delete the appropriate sssion variable,
    #              return value ''
    #      'get'   return user name of the member user (= value of the
    #              session variable, if he is authenticated)
@@ -46,19 +46,18 @@ public static function member_session($func) {
      $_SESSION[CONTROL]=$member_login;
      return;
      endif;
-   # --- empty session variable
+   # --- delete session variable
    if($func=='end'):
+     if(session_status()!=PHP_SESSION_ACTIVE) session_start();
      $_SESSION[CONTROL]='';
      return;
      endif;
    #
    # --- return member user's user name if he is authenticated
    if($func=='get'):
-     if(!empty($_SESSION[CONTROL])):
-       return $_SESSION[CONTROL];
-       else:
-       return;
-       endif;
+     $ses='';
+     if(!empty($_SESSION[CONTROL])) $ses=$_SESSION[CONTROL];
+     return $ses;
      endif;
    #
    # --- return member user's user name or password
@@ -316,7 +315,7 @@ public static function login_page() {
    if(!empty($_POST['passwd'])) $passwd=$_POST['passwd'];
    #
    # --- ... or sign off (delete session variable)
-   if(!empty($_POST['action'])) access_control::member_session('end');
+   if(!empty($_POST['action'])) self::member_session('end');
    #
    # --- analysing the input values
    $error='';
@@ -344,7 +343,7 @@ public static function login_page() {
             '.$st_butt.'</button></td></tr>';
      else:
      # --- set session variable
-     if(empty($error)) self::member_session('set');
+     self::member_session('set');
      # --- sign off form
      $success=$st_memb.' \''.$member.'\' '.$st_auth;
      echo '
