@@ -1,4 +1,9 @@
 # access_control
+<h4>Version 1.7.2</h4>
+<ul>
+    <li>Die Abmeldung nach erfolgreicher Authentifizierung funktioniert
+        jetzt vorschriftsmäßig.</li>
+</ul>
 <h4>Version 1.7.1</h4>
 <ul>
     <li>Ergänzung für den Verweis auf eine Mediadatei in der Form
