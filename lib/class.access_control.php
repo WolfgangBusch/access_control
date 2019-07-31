@@ -7,6 +7,7 @@
  */
 #
 define('CONTROL',          $this->getPackageId());  // Package-Id
+define('SP_CONTROL',       'special_control');
 define('CAT_PROTECTED',    'cat_protected_id');
 define('CAT_FORBIDDEN',    'cat_forbidden_id');
 define('MEDCAT_PROTECTED', 'medcat_protected_id');
@@ -19,20 +20,26 @@ class access_control {
 #
 public static function member_session($func) {
    #   Returning different values depending on the value of $func
-   #   $func=
-   #      'set'   authenticate (sign in) the member user,
-   #              i.e. set the appropriate session variable,
-   #              return value ''
-   #      'end'   sign off the member user,
-   #              i.e. delete the appropriate sssion variable,
-   #              return value ''
-   #      'get'   return user name of the member user (= value of the
-   #              session variable, if he is authenticated)
-   #              return value '' (otherwise)
-   #      'name'  return the member user's user name (as configurated)
-   #              return '', if not configured
-   #      'pwd'   return the member user's password (as configurated)
-   #              return '', if not configured
+   #   $func              control variable to perform theese actions:
+   #            ='name'   return the member user's user name (as configurated)
+   #                         return '', if not configured
+   #            ='pwd'    return the member user's password (as configurated)
+   #                         return '', if not configured
+   #            ='set'    authenticate (sign in) the member user,
+   #                         i.e. set the appropriate session variable,
+   #                         return value ''
+   #            ='get'    return user name of the member user (= value of the
+   #                         session variable, if he is authenticated)
+   #                         return value '' (otherwise)
+   #            ='end'    sign off the member user,
+   #                         i.e. delete the appropriate session variable,
+   #                         return value ''
+   #            =<user>   authenticate (sign in) a special user,
+   #                         i.e. set the appropriate session variable,
+   #                         return value ''
+   #            ='endsp'  sign off the special user,
+   #                         i.e. delete the appropriate session variable,
+   #                         return value ''
    #
    $member_login   =rex_config::get(CONTROL,MEMBER_LOGIN);
    $member_password=rex_config::get(CONTROL,MEMBER_PASSWORD);
@@ -40,16 +47,14 @@ public static function member_session($func) {
    # --- not configured
    if(empty($member_login) or empty($member_password)) return;
    #
-   # --- set session variable
+   # --- return member user's user name or password
+   if($func=='name') return $member_login;
+   if($func=='pwd')  return $member_password;
+   #
+   # --- set session variable (member user)
    if($func=='set'):
      if(session_status()!=PHP_SESSION_ACTIVE) session_start();
      $_SESSION[CONTROL]=$member_login;
-     return;
-     endif;
-   # --- delete session variable
-   if($func=='end'):
-     if(session_status()!=PHP_SESSION_ACTIVE) session_start();
-     $_SESSION[CONTROL]='';
      return;
      endif;
    #
@@ -60,9 +65,23 @@ public static function member_session($func) {
      return $ses;
      endif;
    #
-   # --- return member user's user name or password
-   if($func=='name') return $member_login;
-   if($func=='pwd')  return $member_password;
+   # --- end session (member user), delete session variable
+   if($func=='end'):
+     if(session_status()!=PHP_SESSION_ACTIVE) session_start();
+     $_SESSION[CONTROL]='';
+     return;
+     endif;
+   #
+   # --- end session (special user), delete session variable
+   if($func=='endsp'):
+     if(session_status()!=PHP_SESSION_ACTIVE) session_start();
+     $_SESSION[SP_CONTROL]='';
+     return;
+     endif;
+   #
+   # --- set session variable (special user)
+   if(session_status()!=PHP_SESSION_ACTIVE) session_start();
+   $_SESSION[SP_CONTROL]=$func;
    }
 public static function get_rex_editor() {
    #   returns the Redaxo editor's user name, if he is authenticated
@@ -255,10 +274,9 @@ public static function print_file($file,$media_type) {
 public static function login_page() {
    #   Displaying a login page for a visitor to get authenticated
    #   used functions:
-   #      self::member_session('name');
-   #      self::member_session('pwd');
-   #      self::user_authenticated();
-   #      self::member_session('set');
+   #      self::member_session('name')
+   #      self::member_session('pwd')
+   #      self::login_user($lognam,$password)
    #
    # --- 1 page source for 2 languages
    $clang_id=rex_clang::getCurrentId();
@@ -273,13 +291,50 @@ public static function login_page() {
      return;
      endif;
    #
-   # --- Frontend
-   $member=self::member_session('name');
-   $mempwd=self::member_session('pwd');
-   #
    # --- Language constants
    if($clang_id==1):
      $st_conf ='Bitte zunächst den Mitglieds-Benutzer nebst Passwort konfigurieren!';
+     else:
+     $st_conf ='Configure the member user including password at first, please!';
+     endif;
+   #
+   # --- Frontend
+   $member=self::member_session('name');
+   $mempwd=self::member_session('pwd');
+   if(empty($member) or empty($mempwd)):
+     echo '<p class="access_control_error">'.$st_conf.'</p>';
+     return;
+     endif;
+   self::login_user($member,$mempwd);
+   }
+public static function login_user($lognam,$password) {
+   #   Displaying a login page for a special user to get authenticated
+   #   $lognam            given user name
+   #   $password          given password for this user encrypted/unencrypted
+   #                      if user is member user or other user, respectively
+   #   used functions:
+   #      self::member_session('name')
+   #      self::member_session('set')
+   #      self::member_session('end')
+   #      self::member_session($lognam)
+   #      self::member_session('endsp')
+   #
+   # --- 1 page source for 2 languages
+   $clang_id=rex_clang::getCurrentId();
+   #
+   # --- Backend
+   if(rex::isBackend()):
+     if($clang_id==1):
+       echo '<p>Anzeige einer Login-Seite zur Authentifizierung des Benutzers '.$lognam.'</p>';
+       else:
+       echo '<p>Displaying a sign in page for authentication of user '.$lognam.'</p>';
+       endif;
+     return;
+     endif;
+   #
+   # --- Language constants
+   if($clang_id==1):
+     $st_conf ='+++ Vergleichsdaten (Benutzername und Passwort) dürfen nicht leer sein!';
      $st_in_up='Bitte Benutzername und Passwort eingeben';
      $st_wr_u ='+++ falscher Benutzername';
      $st_in_p ='Bitte Passwort eingeben';
@@ -292,7 +347,7 @@ public static function login_page() {
      $st_memb ='Benutzer';
      $st_auth ='erfolgreich eingeloggt';
      else:
-     $st_conf ='Configure the member user including password at first, please!';
+     $st_conf ='+++ comparables (user name and password) must not be empty!';
      $st_in_up='Insert user name and password, please';
      $st_wr_u ='+++ wrong user name';
      $st_in_p ='Insert password, please';
@@ -305,8 +360,13 @@ public static function login_page() {
      $st_memb ='User';
      $st_auth ='authenticated successfully';
      endif;
-   if(empty($member) or empty($mempwd))
+   #
+   # --- proof given data
+   if(empty($lognam) or empty($password)):
      echo '<p class="access_control_error">'.$st_conf.'</p>';
+     return;
+     endif;
+   $memnam=self::member_session('name');
    #
    # --- get login name and password ...
    $login ='';
@@ -315,14 +375,26 @@ public static function login_page() {
    if(!empty($_POST['passwd'])) $passwd=$_POST['passwd'];
    #
    # --- ... or sign off (delete session variable)
-   if(!empty($_POST['action'])) self::member_session('end');
+   if(!empty($_POST['action'])):
+     if($lognam==$memnam):
+       self::member_session('end');
+       else:
+       self::member_session('endsp');
+       endif;
+     endif;
    #
    # --- analysing the input values
    $error='';
-   if($passwd!=$mempwd) $error=$st_wr_p;
-   if(empty($passwd))   $error=$st_in_p;
-   if($login!=$member)  $error=$st_wr_u;
-   if(empty($login))    $error=$st_in_up;
+   if($lognam==$memnam):
+     $encr_password=$password;
+     else:
+     $encr_password=rex_login::passwordHash($password);
+     endif;
+   $ok=rex_login::passwordVerify($passwd,$encr_password);
+   if(!$ok)            $error=$st_wr_p;
+   if(empty($passwd))  $error=$st_in_p;
+   if($login!=$lognam) $error=$st_wr_u;
+   if(empty($login))   $error=$st_in_up;
    #
    # --- display the form
    echo '
@@ -343,9 +415,13 @@ public static function login_page() {
             '.$st_butt.'</button></td></tr>';
      else:
      # --- set session variable
-     self::member_session('set');
+     if($lognam==self::member_session('name')):
+       self::member_session('set');
+       else:
+       self::member_session($lognam);
+       endif;
      # --- sign off form
-     $success=$st_memb.' \''.$member.'\' '.$st_auth;
+     $success=$st_memb.' \''.$lognam.'\' '.$st_auth;
      echo '
     <tr><td><input type="hidden" name="login" value="" />
             <input type="hidden" name="passwd" value="" /></td>
@@ -382,22 +458,28 @@ public static function configuration() {
      else:
      #
      # --- read the inserted parameters
-     $forb_id   =$_POST['forb_id'];
-     $prot_id   =$_POST['prot_id'];
-     $protmed_id=$_POST['protmed_id'];
+     $forb_id   ='';
+     $prot_id   ='';
+     $protmed_id='';
+     $memb_login='';
+     $memp_pwd  ='';
+     if(!empty($_POST['forb_id']))    $forb_id   =$_POST['forb_id'];
+     if(!empty($_POST['prot_id']))    $prot_id   =$_POST['prot_id'];
+     if(!empty($_POST['protmed_id'])) $protmed_id=$_POST['protmed_id'];
      if(!empty($protmed_id) and intval($protmed_id)<=0):
        $media=rex_media::get($protmed_id);
        $protmed_id=$media->getCategoryId();
        endif;
-     $memb_login=$_POST['memb_login'];
-     $memb_pwd  =$_POST['memb_pwd'];
+     if(!empty($_POST['memb_login'])) $memb_login=$_POST['memb_login'];
+     if(!empty($_POST['memb_pwd']))   $memb_pwd  =$_POST['memb_pwd'];
      #
      # --- save the new configuration parameters (after submit)
      rex_config::set(CONTROL,CAT_FORBIDDEN,   intval($forb_id));
      rex_config::set(CONTROL,CAT_PROTECTED,   intval($prot_id));
      rex_config::set(CONTROL,MEDCAT_PROTECTED,intval($protmed_id));
      rex_config::set(CONTROL,MEMBER_LOGIN,    $memb_login);
-     rex_config::set(CONTROL,MEMBER_PASSWORD, $memb_pwd);
+     $encr_pwd=rex_login::passwordHash($memb_pwd);
+     rex_config::set(CONTROL,MEMBER_PASSWORD, $encr_pwd);
      endif;
    #
    # --- define input buttons and fields
@@ -409,7 +491,7 @@ public static function configuration() {
    # <input type="hidden" name="prot_id" id="REX_LINK_2" value="***" />
    # <input class="form-control" type="text" name="protmed_id" value="***" id="REX_MEDIA_1" readonly />
    $input_memb_login='<input class="form-control" type="text" name="memb_login" value="'.$memb_login.'" />';
-   $input_memb_pwd  ='<input class="form-control" type="password" name="memb_pwd" value="'.$memb_pwd.'" />';
+   $input_memb_pwd  ='<input class="form-control" type="password" name="memb_pwd" value="" />';
    #
    # --- protected categories and media categories
    echo '<div>'.rex_i18n::msg("access_control_settings_first").'</div>
