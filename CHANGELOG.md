@@ -1,4 +1,14 @@
 # access_control
+<h4>Version 1.8</h4>
+<ul>
+    <li>Ergänzung einer weiteren Formularseite zur Authentifizierung
+        eines beliebigen weiteren Benutzers (für mögliche andere
+        Anwendungen), unter Nutzung einer weiteren Session-Variablen.</li>
+    <li>Die Passwörter werden jetzt verschlüsselt abgelegt
+        (<code>rex_login::passwordHash($pwd)</code>) und in
+        verschlüsselter Form abgeprüft
+        (<code>rex_login::passwordVerify($pwd,$encr_pwd)</code>).</li>
+</ul>
 <h4>Version 1.7.2</h4>
 <ul>
     <li>Die Abmeldung nach erfolgreicher Authentifizierung funktioniert
