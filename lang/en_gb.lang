@@ -30,7 +30,7 @@ access_control_details_temp   = This is a PHP code snippet as part of the page t
 access_control_details_head3  = Sign-in procedure
 access_control_details_par3a  = This function prints out a form page for member user's authentication, compare the module.
 access_control_details_par3b  = The passwords are stored encrypted: <code>rex_login::passwordHash($pwd)</code><br/> and are checked in encrypted form: <code>rex_login::passwordVerify($pwd,$encr_pwd)</code>.
-access_control_details_par3c  = The function <code>access_control::login_user($user,$encr_pwd)</code> provides a form page for authentication of any other user (in possibly other applications), using a different session variable.
+access_control_details_par3c  = The function <code>access_control::login_user($user,$pwd)</code> provides a form page for authentication of any other user (in possibly other applications), using a different session variable.
 #   documentation settings
 access_control_settings_first = The following data are stored as Redaxo configuration parameters and will be removed by de-installation of the AddOn, only.
 access_control_settings_par1  = <b>Selection of a categorie or a media categorie to be protected:</b><br/>Within and below all articles/files are visible only after authorization has been given.<br/>Make every selection independently. If you omit one of the selections you will miss the related protection.
