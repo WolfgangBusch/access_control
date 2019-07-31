@@ -276,7 +276,7 @@ public static function login_page() {
    #   used functions:
    #      self::member_session('name')
    #      self::member_session('pwd')
-   #      self::login_user($lognam,$password)
+   #      self::login_user1($lognam,$password)
    #
    # --- 1 page source for 2 languages
    $clang_id=rex_clang::getCurrentId();
@@ -305,13 +305,22 @@ public static function login_page() {
      echo '<p class="access_control_error">'.$st_conf.'</p>';
      return;
      endif;
-   self::login_user($member,$mempwd);
+   self::login_user1($member,$mempwd);
    }
 public static function login_user($lognam,$password) {
+   #   encrypt the given password and enter authentication form
+   #   $lognam            given user name
+   #   $password          given password (un-encrypted!) for this user
+   #   used functions:
+   #      self::login_user1($lognam,$password
+   #
+   $encr_password=rex_login::passwordHash($password);
+   self::login_user1($lognam,$encr_password);
+   }
+public static function login_user1($lognam,$password) {
    #   Displaying a login page for a special user to get authenticated
    #   $lognam            given user name
-   #   $password          given password for this user encrypted/unencrypted
-   #                      if user is member user or other user, respectively
+   #   $password          given password (encrypted!) for this user
    #   used functions:
    #      self::member_session('name')
    #      self::member_session('set')
@@ -385,12 +394,7 @@ public static function login_user($lognam,$password) {
    #
    # --- analysing the input values
    $error='';
-   if($lognam==$memnam):
-     $encr_password=$password;
-     else:
-     $encr_password=rex_login::passwordHash($password);
-     endif;
-   $ok=rex_login::passwordVerify($passwd,$encr_password);
+   $ok=rex_login::passwordVerify($passwd,$password);
    if(!$ok)            $error=$st_wr_p;
    if(empty($passwd))  $error=$st_in_p;
    if($login!=$lognam) $error=$st_wr_u;
