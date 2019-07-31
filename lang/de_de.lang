@@ -27,6 +27,10 @@ access_control_details_par2b  = 0: Seite darf ohne Einschränkungen angezeigt we
 access_control_details_par2c  = 1: Seite liegt im geschützten Bereich, der Besucher ist <b>nicht</b> authentifiziert
 access_control_details_par2d  = 2: Seite liegt im verbotenen Bereich, der Besucher ist <b>nicht</b> als Site-Administrator eingeloggt
 access_control_details_temp   = Hier ein PHP-Code-Schnipsel für ein Seiten-Template, um ggf. eine entsprechende Fehlermeldung anstelle des Artikelinhalts anzuzeigen
+access_control_details_head3  = LogIn-Verfahren
+access_control_details_par3a  = Diese function gibt eine Formularseite für die Anmeldung des Mitglieds-Benutzers aus, vergl. den Modul.
+access_control_details_par3b  = Die Passwörter werden verschlüsselt abgelegt: <code>rex_login::passwordHash($pwd)</code><br/> und in verschlüsselter Form abgeprüft: <code>rex_login::passwordVerify($pwd,$encr_pwd)</code>.
+access_control_details_par3c  = Die function <code>access_control::login_user($user,$password)</code> liefert eine weitere Formularseite zur Authentifizierung eines beliebigen sonstigen Benutzers (für mögliche andere Anwendungen), unter Nutzung einer weiteren Session-Variablen.
 #   documentation settings
 access_control_settings_first = Die folgenden Daten werden als Redaxo-Konfigurationparameter abgelegt und erst mit der De-Installation des AddOns wieder entfernt.
 access_control_settings_par1  = <b>Auswahl einer geschützten Kategorie bzw. Medienkategorie:</b><br/>Innerhalb und unterhalb sind alle Artikel/Dateien nur nach erfolgter Autorisierung sichtbar.<br/>Jede Auswahl erfolgt unabhängig. Wo keine Auswahl getroffen wird, entfällt der entsprechende Schutz.
