@@ -36,5 +36,13 @@ rex_i18n::msg("access_control_details_temp").':<pre>
      else:
      echo $this->getArticle(); // article content
      endif;</pre>
-</div>';
+</div>
+
+<div><br/><b>'.rex_i18n::msg("access_control_details_head3").':</b>
+<code>access_control::login_page()</code></div>
+<div class="access_control_indent">'.
+rex_i18n::msg("access_control_details_par3a").'<br/>'.
+rex_i18n::msg("access_control_details_par3b").'<br/>'.
+rex_i18n::msg("access_control_details_par3c").'
+<br/>&nbsp;</div>';
 ?>
