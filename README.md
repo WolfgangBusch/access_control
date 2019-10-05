@@ -36,10 +36,11 @@ auch dann Lesezugriff auf seine Seiten, wenn diese in geschützten
 Bereichen liegen.</div>
 
 <div><br/><b>Überprüfung der Zugriffsberechtigung:</b></div>
-<div>Bei fehlender Zugriffsberechtigung wird anstelle der
-angeforderten Mediendatei automatisch ein Fehlerbild angezeigt.
-Die Überprüfung, ob ein angeforderter Artikel öffentlich,
-geschützt oder verboten ist, kann mithilfe einer AddOn-Funktion
-vorgenommen werden, sinnvollerweise im Seiten-Template.
-An dieser Stelle kann eine entsprechende Fehlermeldung anstelle
-des Artikelinhalts angezeigt werden.</div>
+<div>Ob ein angeforderter Artikel öffentlich, geschützt oder
+verboten ist, kann mithilfe einer AddOn-Funktion festgestellt werden,
+sinnvollerweise im Seiten-Template. Dort kann ggf. ein Hinweis oder
+ein Link auf eine Login-Seite anstelle des Artikelinhalts angezeigt
+werden. Die Überprüfung, ob eine Mediendatei öffentlich oder geschützt
+ist, erfolgt in der Boot-Datei. Bei fehlender Zugriffsberechtigung
+wird anstelle der angeforderten Mediendatei ein Standard-Fehlerbild
+angezeigt.</div>
