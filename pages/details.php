@@ -3,46 +3,41 @@
  * Access Control AddOn
  * @author wolfgang[at]busch-dettum[dot]de Wolfgang Busch
  * @package redaxo5
- * @version Juli 2019
+ * @version Oktober 2019
 */
-echo '<div><b>'.rex_i18n::msg("access_control_details_head1").':</b>
-<code>RewriteRule</code></div>
+echo '<div><b>'.
+rex_i18n::msg("access_control_details_head1").'</b></div>
 <div class="access_control_indent">'.
-rex_i18n::msg("access_control_details_par1a").':<pre>
-   /media/filename1
-   index.php?rex_img_file=filename2</pre>'.
-rex_i18n::msg("access_control_details_par1b").'<pre>
-   index.php?auth_file=filename1</pre>'.
-rex_i18n::msg("access_control_details_par1c").':<pre>
-   RewriteRule ^media/(.*)    index.php?auth_file=$1</pre>
-</div>
+rex_i18n::msg("access_control_details_par1").'<pre>
+   &lt;?php
+   $uid=access_control::login_page();   // if($uid<=0): undefined guardian user
+   ?&gt;</pre></div>
 
-<div><br/><b>'.rex_i18n::msg("access_control_details_head2").':</b>
-<code>access_control::protected_or_forbidden()</code></div>
+<div><br/><b>'.
+rex_i18n::msg("access_control_details_head2").'</b></div>
 <div class="access_control_indent">'.
-rex_i18n::msg("access_control_details_par2a").':
+rex_i18n::msg("access_control_details_par2").'
 <div class="access_control_indent">'.
-rex_i18n::msg("access_control_details_par2b").'<br/>'.
-rex_i18n::msg("access_control_details_par2c").'<br/>'.
-rex_i18n::msg("access_control_details_par2d").'</div>'.
-rex_i18n::msg("access_control_details_temp").':<pre>
-   $rc=access_control::protected_or_forbidden();
-   if($rc>0):
-     if($rc==1):
-       echo "... protected ...";
+rex_i18n::msg("access_control_details_par2a").'</div>'.
+rex_i18n::msg("access_control_details_par2b").'<pre>
+   $uid=access_control::protected_or_forbidden();
+   if($uid>0):
+     if($uid==1):
+       #   forbidden
        else:
-       echo "... forbidden ...";
+       #   protected
+       echo \'... &lt;a href="...../login_page.html?uid=$uid"&gt;Sign in&lt;/a&gt; ...\';
        endif;
      else:
      echo $this->getArticle(); // article content
      endif;</pre>
 </div>
 
-<div><br/><b>'.rex_i18n::msg("access_control_details_head3").':</b>
-<code>access_control::login_page()</code></div>
-<div class="access_control_indent">'.
-rex_i18n::msg("access_control_details_par3a").'<br/>'.
-rex_i18n::msg("access_control_details_par3b").'<br/>'.
-rex_i18n::msg("access_control_details_par3c").'
-<br/>&nbsp;</div>';
+<div><br/><b>'.
+rex_i18n::msg("access_control_details_head3").'</b></div>
+<div class="access_control_indent"><pre>
+   RewriteRule  ^media/(.*)  index.php?auth_file=$1</pre>'.
+rex_i18n::msg("access_control_details_par3").'
+</div>
+<div>&nbsp;</div>';
 ?>
