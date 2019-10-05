@@ -1,4 +1,23 @@
 # access_control
+<h4>Version 2.0</h4>
+<ul>
+    <li>Der bisherige 'Gemeinschaftsbenutzer' wird ersetzt durch einen
+        Redaxo-Benutzer (rex_user). Darüber hinaus kann der Zugriff auf
+        verschiedene Kategorien und/oder Medienkategorien individuell
+        über mehrere Redaxo-Benutzer kontrolliert werden. Damit entfällt
+        auch die gesamte Konfiguration.</li>
+    <li>Die Funktion protected_or_forbidden() gibt jetzt andere Werte
+        zurück. Die entsprechende Passage im Seiten-Template muss
+        geändert werden!!!</li>
+    <li>An die Login-Seite muss nun die Redaxo-User-Id des jeweiligen
+        Bewacher-Benutzer übergeben werden (per URL-Parameter
+        <code>uid=user_id</code>). Für die Seite wird kein Modul mehr
+        zur Verfügung gestellt (Einzeiler, kann per copy & paste aus
+        der Beschreibung übernommen werden).</li>
+    <li>Falls Kategorien und/oder Medienkategorien geschützt werden,
+        für die ein Redaxo-Redakteur zuständig ist, ist dieser auch
+        authentifiziert, wenn er im Backend eingeloggt ist.</li>
+</ul>
 <h4>Version 1.8</h4>
 <ul>
     <li>Ergänzung einer weiteren Formularseite zur Authentifizierung
