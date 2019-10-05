@@ -3,48 +3,34 @@
 access_control              = Access Control
 access_control_introduction = Introduction
 access_control_description  = Description
-access_control_settings     = Settings
 access_control_details      = Details
+#   login page
+access_control_login_in_username_pwd = Insert user name and password, please
+access_control_login_wrong_username  = +++ wrong user name
+access_control_login_in_pwd          = Insert password, please
+access_control_login_wrong_pwd       = +++ wrong password
+access_control_login_username        = User name
+access_control_login_pwd             = Password
+access_control_login_button_in       = sign in
+access_control_login_button_off      = sign off
+access_control_login_val_off         = signoff
+access_control_login_user            = User
+access_control_login_authenticated   = authenticated successfully
 #   documentation help
-access_control_help           = This AddOn offers access control on sectors of articles or media files, respectively.<br/>The authorization for access requires the specification of name and password of a community user and is stored in a session variable.<br/>Only one simple rewrite rule is required.<br/>The AddOn is designed completely bilingual (german, english).
+access_control_help           = This add-on provides access protection for selected areas of articles and/or media files. Access is controlled by authentication of Redaxo users who are assigned the appropriate categories. The authorization granted is stored session-based.<br/>Only a simple rewrite rule is required.<br/>The add-on is fully bilingual (German, English).
 #   documentation description
-access_control_descr_head1    = Protected area
-access_control_descr_par1     = It is possible to protect all articles and all media files located in the path below a special category or media category, respectively. Appropriate categories are to be set on the configuration page. It is no limitation to provide exactly one protected category and one protected media category ("protected area"), because every article and every media file can be protected by moving it properly.
-access_control_descr_head2    = Member user
-access_control_descr_par2     = The AddOn provides a module for displaying a sign-in form where visitors can authenticate to access protected areas. A corresponding user name and an associated password can be configured. By knowing this access data, the visitor becomes a member of a community. - The sign-in is session based.<br/>An authenticated Redaxo editor is authorized to access, independently.
-access_control_descr_head3    = Forbidden area
-access_control_descr_par3     = Furthermore the site administrator can set a category in the configuration below which only he can view articles as soon as he is logged in ("forbidden area").
-access_control_descr_head4    = Access authorization check
-access_control_descr_par4     = In the absence of access authorization, an error image will automatically be displayed instead of the requested media file. Checking whether a requested article is public, protected or forbidden can be done by using an AddOn function, meaningfully in the page template. At this place a corresponding error message can be displayed instead of the article content.
+access_control_descr_head1    = Protected areas:
+access_control_descr_par1     = Roles for Redaxo users typically select categories and media categories to specify an editor's responsibility (write access) for all articles and media files in their path. In this add-on, appropriately defined categories and top media categories can be interpreted as "protected areas" that visitors only get read access to, after authentication in the front end with name and password of the associated Redaxo user.
+access_control_descr_head2    = Guardian user:
+access_control_descr_par2     = Redaxo users with such roles can be set up as "guardian users" for their areas. In this way you can specify a category, too, in whose path only the site administrator has read access as a visitor if he has signed in in the backend ("forbidden area").<br/>Unlike editors, a guardian user must be defined as inactive, and the "Description" field must be given the value "Protector", in the case of the guardian for the forbidden area the value "Guardian".<br/>A Redaxo editor has read access to his pages as a visitor if he has signed in in the backend, even if they are located in protected areas.
+access_control_descr_head3    = Access authorization check:
+access_control_descr_par3     = Whether a requested article is public, protected or forbidden can be determined using an add-on function, reasonably in the page template. If necessary, a hint or a link to a sign-in page can be issued instead of the article content. Checking whether a media file is public or protected is done in the boot file. If there is no access permission, a default error image is displayed instead of the requested media file.
 #   documentation details
-access_control_details_head1  = Rewriting of media files
-access_control_details_par1a  = Usually a media file address in a picture reference or an article reference is written down in one of the following formats
-access_control_details_par1b  = To verify the access authorization on a media file at first the file name must be determined from its file address. In case of the second format it can easily be separated as address parameter. So the first format is transformed into this one
-access_control_details_par1c  = by correspondingly rewriting the address
-access_control_details_head2  = Access control on the current page
-access_control_details_par2a  = This AddOn function returns the following values
-access_control_details_par2b  = 0: Page is allowed to be displayed without restrictions
-access_control_details_par2c  = 1: Page is located in the protected area, the visitor is <b>not</b> authenticated
-access_control_details_par2d  = 2: Page is located in the forbidden area, the visitor is <b>not</b> authenticated as site administrator
-access_control_details_temp   = This is a PHP code snippet as part of the page template in order to possibly display a corresponding error message instead of the article content
-access_control_details_head3  = Sign-in procedure
-access_control_details_par3a  = This function prints out a form page for member user's authentication, compare the module.
-access_control_details_par3b  = The passwords are stored encrypted: <code>rex_login::passwordHash($pwd)</code><br/> and are checked in encrypted form: <code>rex_login::passwordVerify($pwd,$encr_pwd)</code>.
-access_control_details_par3c  = The function <code>access_control::login_user($user,$pwd)</code> provides a form page for authentication of any other user (in possibly other applications), using a different session variable.
-#   documentation settings
-access_control_settings_first = The following data are stored as Redaxo configuration parameters and will be removed by de-installation of the AddOn, only.
-access_control_settings_par1  = <b>Selection of a categorie or a media categorie to be protected:</b><br/>Within and below all articles/files are visible only after authorization has been given.<br/>Make every selection independently. If you omit one of the selections you will miss the related protection.
-access_control_settings_col12 = category or media category choosen
-access_control_settings_col13 = Selection by
-access_control_settings_col21 = protected
-access_control_settings_col23 = category main article
-access_control_settings_col31 = protected
-access_control_settings_col33 = any file of the media category
-access_control_settings_col41 = forbidden
-access_control_settings_col43 = category main article
-access_control_settings_col52 = visible for authenticated site administrator only
-access_control_settings_par2  = <b>Member user's access data:</b><br/>Nobody else (accept authenticated editors) are allowed to access protected articles and media files.
-access_control_settings_user  = User name
-access_control_settings_pwd   = Password
-access_control_settings_title = save choosen parameters
-access_control_settings_text  = save
+access_control_details_head1  = Sign-in procedure for guardian users:
+access_control_details_par1   = Create a form page that contains only the call to an add-on function for signing in a guardian user. The ID of the respective guardian ($uid) is passed to the page using url parameter "uid=$uid". The function checks the password in encrypted form, stores a session variable in case of success and returns the ID of the guardian.
+access_control_details_head2  = Access control on the current page:
+access_control_details_par2   = The integer return value of an add-on function allows you to decide whether the current page can be viewed (0) or not (1,2,3,...):
+access_control_details_par2a  = =0: the page is public or the visitor is authorized<br/>=1: forbidden area, the visitor has not signed in as site administrator<br/>>1: (= ID of the guardian user of the page) the visitor has not authenticated
+access_control_details_par2b  = The following is a schematic PHP code snippet for a page template to display a corresponding note or a link to a sign-in page instead of the article content, if necessary:
+access_control_details_head3  = Rewriting of media files:
+access_control_details_par3   = In this way, the file in question can be detected in all media references by means of rex_request functions, and the access permission can already be checked in the boot file.
