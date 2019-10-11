@@ -1,4 +1,9 @@
 # access_control
+<h4>Version 2.1</h4>
+<ul>
+    <li>Der Quellcode ist redaktionell und mit Blick auf bessere
+        Performance überarbeitet.</li>
+</ul>
 <h4>Version 2.0</h4>
 <ul>
     <li>Der bisherige 'Gemeinschaftsbenutzer' wird ersetzt durch einen
