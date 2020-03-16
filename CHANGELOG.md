@@ -1,4 +1,8 @@
 # access_control
+<h4>Version 2.1.1</h4>
+<ul>
+    <li>Kleinere Korrekturen am Programmcode zur Vermeidung von PHP-Warnungen.</li>
+</ul>
 <h4>Version 2.1</h4>
 <ul>
     <li>Der Quellcode ist redaktionell und mit Blick auf bessere
