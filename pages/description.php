@@ -3,7 +3,7 @@
  * Access Control AddOn
  * @author wolfgang[at]busch-dettum[dot]de Wolfgang Busch
  * @package redaxo5
- * @version Oktober 2019
+ * @version März 2020
 */
 echo '<div><b>'.rex_i18n::msg("access_control_descr_head1").'</b></div>
 <div class="access_control_indent">'.rex_i18n::msg("access_control_descr_par1").'</div>
