@@ -3,7 +3,7 @@
  * Access Control AddOn
  * @author wolfgang[at]busch-dettum[dot]de Wolfgang Busch
  * @package redaxo5
- * @version Oktober 2019
+ * @version März 2020
  */
 define('CONTROL',     $this->getPackageId());  // Package-ID
 #     description of inactive Redaxo users controlling protected/forbidden categories
@@ -74,7 +74,7 @@ public static function get_locale() {
    #
    $loc_all=rex_i18n::getLocales();
    $code   =rex_clang::get(rex_clang::getCurrentId())->getCode();
-   $locale='';
+   $locale ='';
    for($i=0;$i<count($loc_all);$i=$i+1):
       $loc=$loc_all[$i];
       $brr=explode('_',$loc);
@@ -113,7 +113,7 @@ public static function session_end($login) {
    }
 public static function protected_categories($role,$permtype) {
    #   Returns the categories or media categories defined in a
-   #   Redaxo single user role.
+   #   Redaxo single user role as a comma separated string.
    #   $role              given role ID
    #   $permtype          =PERM_STRUC/PERM_MEDIA
    #
@@ -246,7 +246,7 @@ public static function guardian_users() {
    }
 public static function guarded_category($art_id,$gusers) {
    #   Returns the ID of a protected or forbidden category if a given article
-   #   is in the path of that category.
+   #   is in the path of that category or an empty string, otherwise.
    #   $art_id            ID of the given article
    #   $gusers            array of all defined guardian users
    #
@@ -279,10 +279,10 @@ public static function article_guardian_users($art_id) {
    # --- article not located in any protected or forbidden category
    $gusers=self::guardian_users();
    $cat_id=self::guarded_category($art_id,$gusers);
-   if(empty($cat_id)) return;
+   $brr=array();
+   if(empty($cat_id)) return $brr;
    #
    # --- article located in one of the protected or forbidden categories
-   $brr=array();
    $m=0;
    for($i=1;$i<=count($gusers);$i=$i+1):
       $catid=$gusers[$i]['catid'];
