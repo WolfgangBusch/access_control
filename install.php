@@ -5,5 +5,6 @@
  * @package redaxo5
  * @version November 2020
 */
-echo '<div>'.rex_i18n::rawMsg('access_control_help').'</div>';
+require_once __DIR__.'/lib/class.access_control.php';
+access_control::cache_guardian_users();
 ?>

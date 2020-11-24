@@ -1,4 +1,31 @@
 # access_control
+<h4>Version 2.2</h4>
+Durch Nutzung des AddOn-Caches sowie zusätzliche Session-Variable werden
+etliche Zugriffe auf die Redaxo-Tabellen rex_user und rex_user_role
+vermieden, um eine bessere Performance des AddOns zu erreichen.
+<ul>
+    <li>Die Daten der Bewacher-Benutzer werden jetzt im AddOn-Cache
+        abgelegt, und zwar über die neue install.php. Daher muss nach
+        Einrichtung und nach jeder Änderung der Bewacher-Benutzer eine
+        Re-Installation des AddOns durchgeführt werden. Der Cache wird
+        bei der De-Installation wieder gelöscht. Wird der Cache auf
+        anderem Wege (z. B. in den System-Einstellungen) gelöscht,
+        ist ebenfalls ein re-install nötig, um den AddOn-Cache neu
+        aufzubauen.</li>
+    <li>Nach Authentifizierung eines Besuchers werden jetzt alle für
+        die Zugriffskontrolle notwendigen Daten des zugehörigen
+        Bewacher-Benutzers in Session-Variablen gespeichert, nicht
+        nur dessen Login-Name.</li>
+    <li>Solange ein Besucher als Redakteur im Backend eingeloggt ist,
+        hat er Zugriff auf die Kategorien und Medienkategorien, die
+        seiner Rolle zugeordnet sind. Dazu werden jetzt auch seine
+        für die Zugriffskontrolle notwendigen Daten im Session-Array
+        gespeichert, analog zu einem authentifizierten Besucher.</li>
+    <li>Wenn mehrere Bewacher-Benutzer den Zugriff auf eine Kategorie
+        kontrollieren, kann sich ein Besucher jetzt über jeden dieser
+        Bewacher authentifizieren, nicht nur (wie bisher) über den
+        zufällig letzten.</li>
+</ul>
 <h4>Version 2.1.1</h4>
 <ul>
     <li>Kleinere Korrekturen am Programmcode zur Vermeidung von PHP-Warnungen.</li>

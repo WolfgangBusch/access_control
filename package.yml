@@ -1,11 +1,12 @@
-package: access_control
-version: '2.1.1'
-author: 'Wolfgang Busch'
-supportpage: redaxo.org/forum/
+package:  access_control
+version:  '2.2'
+author:   Wolfgang Busch
+supportpage: redaxo.org/support/community/
 
 page:
     title: 'translate:access_control'
-    perm: access_control[]
+    perm:  admin[]
+    icon:  rex-icon fa-hand-stop-o
     subpages:
         introduction: { title: 'translate:introduction' }
         description:  { title: 'translate:description' }
