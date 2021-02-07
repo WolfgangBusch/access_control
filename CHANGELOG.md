@@ -1,4 +1,25 @@
 # access_control
+<h4>Version 2.3</h4>
+<ul>
+    <li>Die Dokumentation ist überarbeitet und damit (hoffentlich)
+        benutzerfreundlicher.</li>
+    <li>In der Detailbeschreibung ist ein Fehler verbessert, genauer
+        im PHP-Code-Schnipsel für das Seiten-Template und dort im
+        Link auf die Login-Seite.</li>
+    <li>Die Funktion "protected_or_forbidden()" ist umbenannt in
+        "protected_or_prohibited()". Der entsprechende Code-Schnipsel
+        für das Seiten-Template muss spätestens mit der nächsten
+        AddOn-Version angepasst werden (derzeit ist die bisherige
+        Funktion noch als Alias vorhanden).</li>
+    <li>Der Aufruf der Login-Seite liefert die Ids der
+        Bewacher-Benutzer, die sich auf der Seite authentifizieren
+        können. Ein Aufruf ohne oder mit leerem URL-Parameter liefert
+        jetzt die Ids ALLER Bewacher-Benutzer anstatt keine.</li>
+    <li>Ist ein Bewacher-Benutzer eingeloggt, zeigt ein erneuter
+        Aufruf der Login-Seite jetzt zunächst nur einen
+        Abmelden-Button. Erst nach erfolgter Abmeldung wird ein
+        neues Authentifizierungsformular angezeigt.</li>
+</ul>
 <h4>Version 2.2</h4>
 Durch Nutzung des AddOn-Caches sowie zusätzliche Session-Variable werden
 etliche Zugriffe auf die Redaxo-Tabellen rex_user und rex_user_role
