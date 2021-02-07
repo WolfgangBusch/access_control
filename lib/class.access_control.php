@@ -3,13 +3,13 @@
  * Access Control AddOn
  * @author wolfgang[at]busch-dettum[dot]de Wolfgang Busch
  * @package redaxo5
- * @version November 2020
+ * @version Februar 2021
  */
 define('CONTROL',     'access_control');  // Package-ID
 define('USER_PARAMS', 'login,id,description,role');   // rex_user parameters
 define('CACHE_FILE',  'guardian_users.json');
 define('PROTECTOR',   'Protector');      // description of guardian user
-define('GUARDIAN',    'Guardian');       // description of guardian user for the forbidden area
+define('GUARDIAN',    'Guardian');       // description of guardian user for the prohibited area
 define('EDITOR',      'Editor');         // description of authenticated Redaxo editor
 define('VISITOR',     'Visitor');        // description of authenticated visitor
 define('PERM_STRUC',  'structure');      // rex_user_role complex_perm 'structure'
@@ -27,14 +27,14 @@ class access_control {
 #      session_get($type)
 #      session_end($user)
 #   protecting categories functions:
-#      protected_or_forbidden()
+#      protected_or_prohibited()     alias: protected_or_forbidden()
 #         guardian_users()
 #            cache_guardian_users()
 #         rex_editor()
 #            guardian_permissions($uid,$permkey)
 #            session_get($type)
 #            session_set($type,$user)
-#         protected_or_forbidden_intern($art_id,$gusers,$rexeditor)
+#         protected_or_prohibited_intern($art_id,$gusers,$rexeditor)
 #            article_guardian_users($art_id,$gusers)
 #            session_get($type)
 #   protecting media categories functions:
@@ -151,8 +151,8 @@ public static function guardian_permissions($uid,$permkey) {
 # ----- session functions ---------------------------------------------
 public static function session_set($type,$user) {
    #   Store an authenticated user as an associative array in session variables:
-   #   $type              =VISITOR: a guardian user has authenticated via login page
-   #                      =EDITOR:  a Redaxo editor has authenticated via backend sign in
+   #   $type              =VISITOR: a guardian user has authenticated via sign-in page
+   #                      =EDITOR:  a Redaxo editor has authenticated via backend sign-in
    #   $user              Array of the authenticated user: $_SESSION[CONTROL][$type][]
    #     ['login']        rex_user column 'login'
    #     ['id']           rex_user column 'id'
@@ -181,7 +181,7 @@ public static function session_get($type) {
 public static function session_end($user) {
    #   Ends session.
    #   $user              array of the guardian user having authenticated
-   #                      via login page
+   #                      via sign-in page
    #
    if(isset($user)):
      if(session_status()!=PHP_SESSION_ACTIVE) session_start();
@@ -193,22 +193,27 @@ public static function session_end($user) {
 #
 # ----- protecting categories functions -------------------------------
 public static function protected_or_forbidden() {
+   #   Alias for the following function
+   #
+   self::protected_or_prohibited();
+   }
+public static function protected_or_prohibited() {
    #   Determines whether the access to the current article is allowed or not.
    #   Returns the following value:
    #      =0      access is allowed because
    #              - the article is public or
-   #              - the visitor has authenticated via login page
+   #              - the visitor has authenticated via sign-in page
    #                (giving login and password of one of the guardian users
    #                protecting a category containing the article) or
    #              - the visitor is authorized having signed in as Redaxo editor
    #                in the backend
    #      =1      access denied because
-   #              - the article is located in the forbidden category and
+   #              - the article is located in the prohibited category and
    #              - the visitor has not authenticated as site adminstrator
    #                in the backend
    #      >1      access denied because
    #              - the article is located in one of the protected categories and
-   #              - the visitor has not authenticated via login page
+   #              - the visitor has not authenticated via sign-in page
    #                (giving login and password of one of the guardian users
    #                protecting a category containing the article) or
    #              = Id of the guarding user who controls access to the category
@@ -216,22 +221,22 @@ public static function protected_or_forbidden() {
    #   used functions:
    #      self::guardian_users()
    #      self::rex_editor()
-   #      self::protected_or_forbidden_intern($art_id,$gusers,$rexeditor)
+   #      self::protected_or_prohibited_intern($art_id,$gusers,$rexeditor)
    #   Exemplary section on top of the page template, shows an error message or
-   #   presents a sign in form instead of the article content
+   #   presents a sign-in form instead of the article content
    #      ...
-   #      $uid=access_control::protected_or_forbidden();
+   #      $uid=access_control::protected_or_prohibited();
    #      if($uid>0):
-   #        if($uid==1):
-   #          #   forbidden
+   #         if($uid==1):
+   #          echo '<p>prohibited area, reserved for the site administrator</p>';
    #          else:
-   #          #   protected
-   #          echo '... <a href="...../login_page.html?uid=$uid">Sign in</a> ...';
+   #          $path='/login.html';   // path to the sign-in page,  t o   b e   r e p l a c e d   individually
+   #          echo '<p>article in protected area, access requires authentication</p>';
+   #          echo '<p><a href="'.$path.'?uid='.$uid.'">Sign in</a></p>';
    #          endif;
    #        else:
-   #        echo $this->getArticle(); // show the article content
+   #        echo $this->getArticle(); // article content
    #        endif;
-   #      endif;
    #      ...
    #
    # --- collect all guardian users from cache
@@ -242,7 +247,7 @@ public static function protected_or_forbidden() {
    #
    # --- access to the article allowed?
    $art_id=rex_article::getCurrentId();
-   $uid=self::protected_or_forbidden_intern($art_id,$gusers,$rexeditor);
+   $uid=self::protected_or_prohibited_intern($art_id,$gusers,$rexeditor);
    return $uid;
    }
 public static function guardian_users() {
@@ -311,7 +316,7 @@ public static function rex_editor() {
    #
    return $editor;
    }
-public static function protected_or_forbidden_intern($art_id,$gusers,$rexeditor) {
+public static function protected_or_prohibited_intern($art_id,$gusers,$rexeditor) {
    #   Determines whether the access to the current article is allowed or not.
    #   Return value (see above)
    #   $art_id            Id of the current article
@@ -327,10 +332,10 @@ public static function protected_or_forbidden_intern($art_id,$gusers,$rexeditor)
    # --- proof whether the access to the current article is allowed
    $prot=array();
    #
-   # --- article not located in a protected or forbidden category
+   # --- article not located in a protected or prohibited category
    if(count($art_gusers)<=0) $prot=array('id'=>0,'protect'=>0);
    #
-   # --- site administrator, signed on
+   # --- site administrator, signed in
    if(count($prot)<=0):
      if(count($rexeditor)>0):
        $redid=$rexeditor['id'];
@@ -338,14 +343,14 @@ public static function protected_or_forbidden_intern($art_id,$gusers,$rexeditor)
        endif;
      endif;
    #
-   # --- forbidden area, access denied
+   # --- prohibited area, access denied
    if(count($prot)<=0):
      for($i=1;$i<=count($art_gusers);$i=$i+1)
         if($art_gusers[$i]['description']==GUARDIAN)
           $prot=array('id'=>$art_gusers[$i]['id'],'protect'=>1);
      endif;
    #
-   # --- protected area, Redaxo editor signed on
+   # --- protected area, Redaxo editor signed in
    if(count($prot)<=0):
      if(count($rexeditor)>0):
        $redid=$rexeditor['id'];
@@ -384,10 +389,6 @@ public static function protected_or_forbidden_intern($art_id,$gusers,$rexeditor)
      if(!empty($uidstr)) $uidstr=substr($uidstr,1);
      $prot=array('id'=>$uidstr,'protect'=>2);
      endif;
-             #
-             # --- not authenticated
-             if(count($prot)<=0) $prot=array('id'=>1,'protect'=>3);
-             if(count($prot)<=0) echo "<h1>protect=3</h1>\n";
    #
    $uid=$prot['id'];
    if($prot['protect']==1) $uid=1;
@@ -405,7 +406,7 @@ public static function article_guardian_users($art_id,$gusers) {
    #   $art_id            Id of the given article
    #   $gusers            array of guarding users
    #
-   # --- article located in any protected or forbidden category?
+   # --- article located in any protected or prohibited category?
    $cat_id='';
    $art=rex_article::get($art_id);
    for($i=1;$i<=count($gusers);$i=$i+1):
@@ -428,7 +429,7 @@ public static function article_guardian_users($art_id,$gusers) {
       endfor;
    if(empty($cat_id)) return array();
    #
-   # --- article located in one of the protected or forbidden categories
+   # --- article located in one of the protected or prohibited categories
    $m=0;
    $prot=array();
    for($i=1;$i<=count($gusers);$i=$i+1):
@@ -500,7 +501,7 @@ public static function print_file($file,$media_type='') {
    # --- access allowed?
    $allowed=TRUE;
    if($protected):
-     #     site administrator or Redaxo editor has signed on?
+     #     site administrator or Redaxo editor has signed in?
      $son=FALSE;
      if($rexeditor['id']==1) $son=TRUE;   // site administrator
      if($rexeditor['id']>=2):
@@ -510,7 +511,7 @@ public static function print_file($file,$media_type='') {
           if($catid[$k]==$tpmcatid) $son=TRUE;   // Redaxo editor
        endif;
      if(!$son):
-       #     visitor has signed on?
+       #     visitor has signed in?
        $sesuser=self::session_get(VISITOR);
        for($i=1;$i<=count($protid);$i=$i+1):
           $visitor=self::get_rex_user($protid[$i]);
@@ -589,26 +590,55 @@ public static function top_parent_media_category($file) {
 #
 # ----- login_page ----------------------------------------------------
 public static function login_page() {
-   #   Displaying an article for authentication of guardian users (sign in page).
-   #   The Ids of the guardian users must be passed as URL parameters in the form
-   #   of a comma-separated string (..../login.html?uid=$string).
-   #   Return value: user Id of that guardian user
-   #                 or 0 (missing URL parameter or wrong user ID)
+   #   Displays an article for authentication of a guardian user (sign-in page).
+   #      Input values:
+   #   $_GET['uid']       comma-separated list of Ids of guardian users that are
+   #                      allowed to be authenticated on the sign-in page.
+   #                      If empty the list is augmented to the Ids of all
+   #                      guardian users defined.
+   #   $_POST['action']   If empty the form parameters will be checked.
+   #                      Otherwise the authenticated user will be signed off.
+   #   $_POST['login']    Guardian user's login, to proof.
+   #   $_POST['passwd']   Guardian user's password (not encrypted), to proof.
+   #      Return value:
+   #                      Guardian user's Id if authenticated or
+   #                      comma-seperated list read in via $_GET['uid'] otherwise.
    #   used functions:
+   #      self::guardian_users()
    #      self::get_rex_user($uid)
    #      self::session_get($type)
    #      self::session_end($user)
    #      self::locale()
-   #      self::guardian_users()
    #      self::session_set($type,$user)
    #
-   # --- get URL parameter and define an array of user Ids
+   # --- get guardian user's Id, if empty switch to ALL guardian users Ids
    $uidstr='';
    if(!empty($_GET['uid'])) $uidstr=$_GET['uid'];
-   if(empty($uidstr)) return 0;
-   $uid=explode(',',$uidstr);
+   if(empty($uidstr)):
+     $gusers=self::guardian_users();
+     for($i=1;$i<=count($gusers);$i=$i+1)
+        if($gusers[$i]['description']!=GUARDIAN) $uidstr=$uidstr.','.$gusers[$i]['id'];
+     if(strlen($uidstr)>=1) $uidstr=substr($uidstr,1);
+     endif;
+   #
+   $logoff='';
+   $action='';
+   if(!empty($_POST['action'])) $action=$_POST['action'];
+   #
+   # --- anyone already logged in?
+   $visitor=self::session_get(VISITOR);
+   if(count($visitor)>0):
+     #     in this case display a logoff button, only
+     if(empty($action)):
+       $uidstr=$visitor['id'];
+       $login=$visitor['login'];
+       $_POST['login']=$login;
+       $logoff='logoff';
+       endif;
+     endif;
    #
    # --- get the user logins and (encrypted) passwords
+   $uid=explode(',',$uidstr);
    for($i=0;$i<count($uid);$i=$i+1):
       $guser=self::get_rex_user($uid[$i]);
       if(count($guser)<=0) return 0;
@@ -623,7 +653,7 @@ public static function login_page() {
    if(!empty($_POST['passwd'])) $passwd=$_POST['passwd'];
    #
    # --- ... or sign off (delete session variables)
-   if(!empty($_POST['action'])):
+   if(!empty($action)):
      $sesuser=self::session_get(VISITOR);
      self::session_end($sesuser);
      endif;
@@ -634,7 +664,7 @@ public static function login_page() {
    # --- analysing the input values
    $error='';
    #     empty login?
-   if(empty($login)) $error=rex_i18n::rawMsg('access_control_login_in_username_pwd');
+   if(empty($login)) $error=rex_i18n::rawMsg('access_control_signin_in_username_pwd');
    #     wrong login?
    if(empty($error)):
      $num=-1;
@@ -643,14 +673,17 @@ public static function login_page() {
           $num=$i;
           break;
           endif;
-     if($num<0) $error=rex_i18n::rawMsg('access_control_login_wrong_username');
+     if($num<0) $error=rex_i18n::rawMsg('access_control_signin_wrong_username');
      endif;
    #     empty password?
-   if(empty($error) and empty($passwd)) $error=rex_i18n::rawMsg('access_control_login_in_pwd');
+   if(empty($error) and empty($passwd)
+      and empty($logoff))   // generating a logoff page
+     $error=rex_i18n::rawMsg('access_control_signin_in_pwd');
    #     wrong password?
-   if(empty($error)):
+   if(empty($error)
+      and empty($logoff)):   // generating a logoff page
      $ok=rex_login::passwordVerify($passwd,$password[$num]);
-     if(!$ok) $error=rex_i18n::rawMsg('access_control_login_wrong_pwd');
+     if(!$ok) $error=rex_i18n::rawMsg('access_control_signin_wrong_pwd');
      endif;
    #
    # --- display the form
@@ -659,17 +692,17 @@ public static function login_page() {
 <form method="post">
 <table>';
    if(!empty($error)):
-     #     sign in form
+     #     sign-in form
      echo '
-    <tr><td>'.rex_i18n::rawMsg('access_control_login_username').': &nbsp;</td>
+    <tr><td>'.rex_i18n::rawMsg('access_control_signin_username').': &nbsp;</td>
         <td><input type="text" name="login" value="'.$login.'" class="access_control_input" /></td></tr>
-    <tr><td>'.rex_i18n::rawMsg('access_control_login_pwd').':</td>
+    <tr><td>'.rex_i18n::rawMsg('access_control_signin_pwd').':</td>
         <td><input type="password" name="passwd" value="'.$passwd.'" class="access_control_input" /></td></tr>
     <tr><td colspan=2">
             <p class="access_control_error">'.$error.'</p></td>
     <tr><td></td>
         <td><button type="submit" name="action" value="">
-            '.rex_i18n::rawMsg('access_control_login_button_in').'</button></td></tr>';
+            '.rex_i18n::rawMsg('access_control_signin_button_in').'</button></td></tr>';
      #     return value
      $uidret=$uidstr;
      else:
@@ -679,16 +712,16 @@ public static function login_page() {
      for($i=1;$i<=count($gusers);$i=$i+1)
         if($gusers[$i]['id']==$uid[$num]) $sesuser=$gusers[$i];
      self::session_set(VISITOR,$sesuser);
-     #     sign off form
-     $success=rex_i18n::rawMsg('access_control_login_user').' \''.$lognam[$num].'\' '.
-              rex_i18n::rawMsg('access_control_login_authenticated');
+     #     sign-off form
+     $success=rex_i18n::rawMsg('access_control_signin_user').' \''.$lognam[$num].'\' '.
+              rex_i18n::rawMsg('access_control_signin_authenticated');
      echo '
     <tr><td><input type="hidden" name="login" value="" />
             <input type="hidden" name="passwd" value="" /></td>
         <td><p class="access_control_success">'.$success.'</p></td></tr>
     <tr><td></td>
-        <td><button type="submit" name="action" value="'.rex_i18n::rawMsg('access_control_login_val_off').'">
-            '.rex_i18n::rawMsg('access_control_login_button_off').'</button></td></tr>';
+        <td><button type="submit" name="action" value="'.rex_i18n::rawMsg('access_control_signin_val_off').'">
+            '.rex_i18n::rawMsg('access_control_signin_button_off').'</button></td></tr>';
      #     return value
      $uidret=$uid[$num];
      endif; 
