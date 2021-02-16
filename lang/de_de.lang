@@ -47,7 +47,6 @@ access_control_details_par1c  = Das Feld "Beschreibung" bekommt den Wert "Protec
 access_control_details_par1d  = Ihm wird eine Rolle zugewiesen. In dieser sind Kategorien und Top-Medienkategorien auszuwählen, die normalerweise den Verantwortungsbereich (Schreibzugriff) des Benutzers als Redakteur definieren. Hier werden sie als geschützte Bereiche interpretiert.
 access_control_details_par1e  = Ein Bewacher-Benutzer kann mehrere derartige Rollen erhalten. Auf diese Weise ist es möglich, dass sich geschützte Bereiche überschneiden und der Zugriff auf Kategorien von mehr als einem Bewacher kontrolliert wird.
 access_control_details_par1f  = Nach Einrichtung der Bewacher-Benutzer wird der <u>Schutzmechanismus durch Re-Installation des AddOns</u> aktiviert bzw. aktualisiert. Dabei werden die zugehörigen <u>Daten im AddOn-Cache abgelegt</u> (json-codiert).
-access_control_details_par1g  = Jede Löschung des Redaxo-Caches (z.B. in den System-Einstellungen) erfordert daher auch eine Re-Installation des AddOns.
 access_control_details_head2  = Anmeldeverfahren für Bewacher-Benutzer:
 access_control_details_par2a  = Es ist ein Artikel anzulegen, der nur den Aufruf der AddOn-Funktion <code>login_page()</code> enthält ("Login-Seite").
 access_control_details_par2b  = Die Seite zeigt ein Eingabeformular für einen Bewacher-Benutzer und dessen Passwort an.
@@ -56,11 +55,11 @@ access_control_details_par2d  = Die Funktion überprüft den Login-Namen des Bew
 access_control_details_par2e  = Falls die Authentifizierung erfolgreich war, gibt die Funktion die Id des eingegebenen Bewachers zurück, andernfalls die eingelesene Id-Liste. Der Rückgabewert kann ggf. weiter ausgewertet werden.
 access_control_details_par2f  = Ist ein Bewacher-Benutzer eingeloggt, zeigt ein erneuter Aufruf der Login-Seite zunächst nur einen Abmelden-Button. Erst nachdem die Abmeldung erfolgt ist, wird ein neues Authentifizierungsformular - passend zum URL-Parameter - angezeigt.
 access_control_details_head3  = Kontrolle des Zugriffs auf die aktuelle Seite:
-access_control_details_par3a  = Der Rückgabewert der AddOn-Funktion <code>protected_or_prohibited()</code> ermöglicht die Entscheidung, ob die aktuelle Seite angezeigt werden darf (0) oder nicht (1,2,3,...):
+access_control_details_par3a  = Der Rückgabewert der AddOn-Funktion <code>protected_or_prohibited()</code> ermöglicht die Entscheidung, ob die aktuelle Seite angezeigt werden darf oder nicht:
 access_control_details_par3b  = =0: die Seite ist öffentlich, oder der Besucher ist autorisiert
 access_control_details_par3c  = =1: verbotener Bereich, der Besucher ist nicht als Site-Administrator im Backend eingeloggt
-access_control_details_par3d  = >1: Id des Bewacher-Benutzers der Seite, der Besucher hat sich nicht authentifiziert
+access_control_details_par3d  = >1: Id des Bewacher-Benutzers der Seite (oder eine Komma-separierte Liste mehrerer Ids >1),<br/> &nbsp; &nbsp; &nbsp; der Besucher hat sich nicht authentifiziert
 access_control_details_par3e  = Es folgt ein schematisches PHP-Code-Schnipsel für ein Seiten-Template, um ggf. einen entsprechenden Hinweis oder einen Link auf eine Login-Seite anstelle des Artikelinhalts anzuzeigen:
 access_control_details_par3f  = Ein Redaxo-Redakteur hat als Besucher auch dann Lesezugriff auf seine Seiten, wenn diese in geschützten Bereichen liegen, sobald er sich im Backend eingeloggt hat.
 access_control_details_head4  = Adressumleitung der Mediendateien:
-access_control_details_par4   = Auf diese Weise ist in allen Medienreferenzen die betreffende Datei mittels rex_request-Funktionen erfassbar, und die Zugriffsberechtigung kann schon in der Boot-Datei kontrolliert werden.
+access_control_details_par4   = Auf diese Weise ist in allen Medienreferenzen die betreffende Datei mittels rex_request-Funktion erfassbar, und die Zugriffsberechtigung kann schon in der Boot-Datei kontrolliert werden.

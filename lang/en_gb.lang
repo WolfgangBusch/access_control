@@ -47,7 +47,6 @@ access_control_details_par1c  = The "Description" field is given the value "Prot
 access_control_details_par1d  = He is assigned a role. In this, categories and top media categories are to be selected, which usually define the user's area of responsibility (write access) as editor. Here they are interpreted as protected areas.
 access_control_details_par1e  = A guardian user can receive multiple such roles. In this way, it is possible that protected areas overlap and access to categories is controlled by more than one guardian.
 access_control_details_par1f  = After the guardian users are set up, the <u> protection mechanism is activated or updated by re-installing the add-on</u>. The associated <u> data is stored in the add-on cache</u> (json encoded).
-access_control_details_par1g  = Any deletion of the Redaxo cache (such as in the system settings) also requires a re-installation of the add-on.
 access_control_details_head2  = Sign-in procedure for guardian users:
 access_control_details_par2a  = An article should be generated which contains only the call to the add-on function <code>login_page()</code> ("sign-in page").
 access_control_details_par2b  = The page displays an input form for a guardian user and his password.
@@ -56,11 +55,11 @@ access_control_details_par2d  = The function checks the login name of the guardi
 access_control_details_par2e  = If the authentication was successful, the function returns the id of the guardian entered, otherwise the read id list. The return value can be used further if necessary.
 access_control_details_par2f  = If a guardian user has signed in, a new call to the login page initially shows only a sign-off button. To get a new authentication form - matching the URL parameter - the sign-off must be completed.
 access_control_details_head3  = Access control on the current page:
-access_control_details_par3a  = The return value of the add-on function <code>protected_or_prohibited()</code> allows you to decide whether the current page can be viewed (0) or not (1,2,3,...):
+access_control_details_par3a  = The return value of the add-on function <code>protected_or_prohibited()</code> allows you to decide whether the current page may be displayed or not:
 access_control_details_par3b  = =0: the page is public or the visitor is authorized
-access_control_details_par3c  = =1: prohibited area, the visitor has not signed in as site the administrator in the backend
-access_control_details_par3d  = >1: Id of the page's guardian user, the visitor has not authenticated
+access_control_details_par3c  = =1: prohibited area, the visitor has not signed in as the site administrator in the backend
+access_control_details_par3d  = >1: Id of the page's guardian user (or a comma-separated list of several ids >1),<br/> &nbsp; &nbsp; &nbsp; the visitor has not authenticated
 access_control_details_par3e  = The following is a schematic PHP code snippet for a page template to display a corresponding note or a link to a sign-in page instead of the article content, if necessary:
 access_control_details_par3f  = A Redaxo editor has access to his pages as a visitor even if they are in protected areas as soon as he has logged in in the backend.
 access_control_details_head4  = Rewrite rule for media files:
-access_control_details_par4   = In this way, the file in question can be detected in all media references by means of rex_request functions, and the access permission can already be checked in the boot file.
+access_control_details_par4   = In this way, the file in question can be detected in all media references by means of rex_request function, and the access permission can already be checked in the boot file.
