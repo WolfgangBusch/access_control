@@ -13,8 +13,7 @@ rex_i18n::rawMsg("access_control_details_head1").'</b></div>
 .rex_i18n::rawMsg("access_control_details_par1c").'<br/>'
 .rex_i18n::rawMsg("access_control_details_par1d").'<br/>'
 .rex_i18n::rawMsg("access_control_details_par1e").'<br/>'
-.rex_i18n::rawMsg("access_control_details_par1f").'<br/>'
-.rex_i18n::rawMsg("access_control_details_par1g").'</div>
+.rex_i18n::rawMsg("access_control_details_par1f").'</div>
 
 <div><br/><b>'.
 rex_i18n::rawMsg("access_control_details_head2").'</b></div>
@@ -53,7 +52,7 @@ rex_i18n::rawMsg("access_control_details_head2").'</b></div>
 <div><br/><b>'
 .rex_i18n::rawMsg("access_control_details_head4").'</b></div>
 <div class="access_control_indent"><pre>
- RewriteRule  ^media/(.*)$  index.php?auth_file=$1</pre>'
+ RewriteRule  ^media/(.*)$  index.php?rex_media_file=$1</pre>'
 .rex_i18n::rawMsg("access_control_details_par4").'
 </div>
 <div>&nbsp;</div>';
