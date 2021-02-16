@@ -1,4 +1,17 @@
 # access_control
+<h4>Version 2.3.1</h4>
+<ul>
+    <li>Die Funktion print_file ist jetzt vereinfacht. Außerdem
+        enthält sie keinen Rückgriff mehr auf ein Fehler-Bild, das
+        in neueren Versionen des Media-Managers nicht mehr verfügbar
+        ist.</li>
+    <li>Jetzt werden auch Mediendateien korrekt angezeigt/ausgeliefert,
+        wenn sie z.B. per Upload in 'Keine Kategorie' zugeordnet
+        wurden.</li>
+    <li>Das AddOn muss nicht nach jedem Löschen des System-Caches
+        re-installiert werden. Die Dokumentation ist entsprechend
+        korrigiert.</li>
+</ul>
 <h4>Version 2.3</h4>
 <ul>
     <li>Die Dokumentation ist überarbeitet und damit (hoffentlich)
