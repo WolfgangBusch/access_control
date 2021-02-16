@@ -1,4 +1,8 @@
 # access_control
+<h4>Version 2.3.2</h4>
+<ul>
+    <li>Ein Flüchtigkeitsfehler in der Dokumentation ist behoben.</li>
+</ul>
 <h4>Version 2.3.1</h4>
 <ul>
     <li>Die Funktion print_file ist jetzt vereinfacht. Außerdem
