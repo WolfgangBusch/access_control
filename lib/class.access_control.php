@@ -55,8 +55,8 @@ class access_control {
 #
 # ----- installation functions ----------------------------------------
 public static function cache_guardian_users() {
-   #   Reads the guardian users from table rex_user and stores them as
-   #   fixed values in a cache file.
+   #   Reads the guardian users from the tables rex_user and rex_user_role
+   #   and stores them as fixed values in a cache file.
    #   used functions:
    #      self::get_guardian_users()
    #
@@ -69,8 +69,8 @@ public static function cache_guardian_users() {
    }
 public static function get_guardian_users() {
    #   Returns all guardian users in a numbered array (numbering from 1)
-   #   whose elements are associative arrays containing
-   #      user parameters:
+   #   whose elements are associative arrays. The guardian user's array
+   #   contains the user parameters:
    #      ['login']       rex_user column 'login'
    #      ['id']          rex_user column 'id'
    #      ['description'] rex_user column 'description'
@@ -78,7 +78,8 @@ public static function get_guardian_users() {
    #      [PERM_STRUC]    numbered array of IDs of categories
    #                      that the user has access to (numbering from 0)
    #      [PERM_MEDIA]    numbered array of IDs of media categories
-   #                      that the user has access to (numbering from 0)
+   #                      that the user has access to (numbering from 0)   
+   #   The data are retrieved from the tables rex_user and rex_user_role.
    #   used functions:
    #      self::guardian_permissions($uid,$permkey)
    #
@@ -105,9 +106,10 @@ public static function get_guardian_users() {
    return $us;
    }
 public static function guardian_permissions($uid,$permkey) {
-   #   Determines either the category Ids or the media category Ids to which
-   #   a given guardian user has access. The Ids are returned in a numbered
-   #   array (numbering from 0).
+   #   Determines either the category Ids or the media category Ids to
+   #   which a given guardian user has access. The Ids are returned in a
+   #   numbered array (numbering from 0). The data are retrieved from the
+   #   tables rex_user and rex_user_role.
    #   $uid               guardian user's Id [rex_user column 'id']
    #   $permkey           =PERM_STRUC (access to categories) or
    #                      =PERM_MEDIA (access to media categories)
@@ -464,34 +466,16 @@ public static function print_file($file,$media_type='') {
    $rexeditor=self::rex_editor();
    #
    # --- rex_media_manager object and absolute path to the media file
-   if(empty($media_type)):
-     $medfile=rex_path::media($file);
-     $managed_media=new rex_managed_media($medfile);
-     $manager=new rex_media_manager($managed_media);
-     else:
-     $counter=rex_media_manager::deleteCache($file,$media_type);
-     $manager=rex_media_manager::create($media_type,$file);
-     $media=$manager->getMedia();
-     $medfile=$media->getMediaPath();
-     $medfile=dirname($medfile.'zzz').'/'.$file;  // in case of $medfile '.../media/'
-     $effects=$manager->effectsFromType($media_type);
-     for($i=0;$i<count($effects);$i=$i+1)
-        if($effects[$i]['effect']=='mediapath'):
-          $managed_media=new rex_managed_media($medfile);
-          $manager=new rex_media_manager($managed_media);
-          break;
-          endif;
-     endif;
+   $counter=rex_media_manager::deleteCache($file,$media_type);
+   $manager=rex_media_manager::create($media_type,$file);
+   $medfile=$manager->getMedia()->getMediaPath();
+   $medfile=dirname($medfile.'zzz').'/'.$file;  // in case of $medfile='.../media/'
    $mtype='';
    if(file_exists($medfile)) $mtype=mime_content_type($medfile);
    #
-   # --- output error file (file not found)
-   if(empty($file) or !file_exists($medfile) or $mtype=='directory'):
-     $errfile=rex_path::addon('media_manager','media/warning.jpg');
-     $managed_media=new rex_managed_media($errfile);
-     $manager=new rex_media_manager($managed_media);
+   # --- output error image (file not found)
+   if(empty($file) or !file_exists($medfile) or $mtype=='directory')
      $manager->sendMedia();
-     endif;
    #
    # --- media file protected?
    $protected=FALSE;
@@ -580,10 +564,13 @@ public static function top_parent_media_category($file) {
    # --- determine the top parent media category
    $medcat=$media->getCategory();
    $medcatid=0;
-   if(!empty($medcat->getPathAsArray()[0])):
-     $medcatid=$medcat->getPathAsArray()[0];
-     else:
-     $medcatid=$medcat->getId();
+   if($medcat!=NULL):
+     $medpath=$medcat->getPathAsArray();
+     if(count($medpath)>0):
+       $medcatid=$medpath[0];
+       else:
+       $medcatid=$medcat->getId();
+       endif;
      endif;
    return $medcatid;
    }
