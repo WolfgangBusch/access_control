@@ -1,4 +1,12 @@
 # access_control
+<h4>Version 2.3.3</h4>
+<ul>
+    <li>Der Frontend-Sprachcode rex_i18n::setLocale(...) wird jetzt
+        über die Sprach-Id der Login-Seite gesetzt, nicht mehr über
+        den Sprach-Code (fehleranfällig!).</li>
+    <li>Die Login-Seite ist nicht leer, wenn noch kein Bewacher-Benutzer
+        definiert ist, sondern zeigt einen entsprechenden Hinweis an.</li>
+</ul>
 <h4>Version 2.3.2</h4>
 <ul>
     <li>Ein Flüchtigkeitsfehler in der Dokumentation ist behoben.</li>
