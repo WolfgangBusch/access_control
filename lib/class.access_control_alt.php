@@ -603,11 +603,6 @@ public static function login_page() {
    if(!empty($_GET['uid'])) $uidstr=$_GET['uid'];
    if(empty($uidstr)):
      $gusers=self::guardian_users();
-     if(count($gusers)<=0 or (count($gusers)==1 and $gusers[1]['description']=='Guardian')):
-       echo '
-<p class="access_control_error">'.rex_i18n::rawMsg('access_control_signin_no_protector').'</p>';
-       return;
-       endif;
      for($i=1;$i<=count($gusers);$i=$i+1)
         if($gusers[$i]['description']!=GUARDIAN) $uidstr=$uidstr.','.$gusers[$i]['id'];
      if(strlen($uidstr)>=1) $uidstr=substr($uidstr,1);
@@ -680,12 +675,13 @@ public static function login_page() {
    #
    # --- display the form
    echo '
+<div class="access_control_frame">
 <form method="post">
-<table class="access_control_frame">';
+<table>';
    if(!empty($error)):
      #     sign-in form
      echo '
-    <tr><td>'.rex_i18n::rawMsg('access_control_signin_username').':&nbsp;</td>
+    <tr><td>'.rex_i18n::rawMsg('access_control_signin_username').': &nbsp;</td>
         <td><input type="text" name="login" value="'.$login.'" class="access_control_input" /></td></tr>
     <tr><td>'.rex_i18n::rawMsg('access_control_signin_pwd').':</td>
         <td><input type="password" name="passwd" value="'.$passwd.'" class="access_control_input" /></td></tr>
@@ -719,17 +715,24 @@ public static function login_page() {
    echo '
 </table>
 </form>
+</div>
 ';
    return $uidret;
    }
 public static function locale() {
    #   Returns the locale of the current article ('de_de' or 'en_gb').
    #
-   if(rex_clang::getCurrentId()==1):
-     $locale='de_de';
-     else:
-     $locale='en_gb';
-     endif;
+   $loc_all=rex_i18n::getLocales();
+   $code   =rex_clang::get(rex_clang::getCurrentId())->getCode();
+   $locale ='';
+   for($i=0;$i<count($loc_all);$i=$i+1):
+      $loc=$loc_all[$i];
+      $brr=explode('_',$loc);
+      if($code==$brr[0]):
+        $locale=$loc;
+        break;
+        endif;
+      endfor;
    return $locale;
    }
 public static function get_rex_user($uid) {
