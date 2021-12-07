@@ -3,7 +3,7 @@
  * Access Control AddOn
  * @author wolfgang[at]busch-dettum[dot]de Wolfgang Busch
  * @package redaxo5
- * @version Februar 2021
+ * @version Dezember 2021
  */
 define('CONTROL',     'access_control');  // Package-ID
 define('USER_PARAMS', 'login,id,description,role');   // rex_user parameters
