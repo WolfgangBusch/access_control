@@ -3,17 +3,8 @@
  * Access Control AddOn
  * @author wolfgang[at]busch-dettum[dot]de Wolfgang Busch
  * @package redaxo5
- * @version Dezember 2021
+ * @version Maerz 2022
  */
-define('CONTROL',     'access_control');  // Package-ID
-define('USER_PARAMS', 'login,id,description,role');   // rex_user parameters
-define('CACHE_FILE',  'guardian_users.json');
-define('PROTECTOR',   'Protector');      // description of guardian user
-define('GUARDIAN',    'Guardian');       // description of guardian user for the prohibited area
-define('EDITOR',      'Editor');         // description of authenticated Redaxo editor
-define('VISITOR',     'Visitor');        // description of authenticated visitor
-define('PERM_STRUC',  'structure');      // rex_user_role complex_perm 'structure'
-define('PERM_MEDIA',  'media');          // rex_user_role complex_perm 'media'
 #
 class access_control {
 #
@@ -38,7 +29,7 @@ class access_control {
 #            article_guardian_users($art_id,$gusers)
 #            session_get($type)
 #   protecting media categories functions:
-#      print_file($gusers,$rexeditor,$file,$media_type='')
+#      control_file($file)
 #         media_guardian_users($file,$gusers)
 #            top_parent_media_category($file)
 #         top_parent_media_category($file)
@@ -53,41 +44,62 @@ class access_control {
 #         cache_guardian_users()
 #      session_set($type,$user)
 #
+# ----- constants -----------------------------------------------------
+const this_addon ='access_control';   // Package-ID
+const user_params='login,id,description,role';   // rex_user parameters
+const cache_file ='guardian_users.json';
+const protector  ='Protector';   // description of guardian user
+const guardian   ='Guardian';    // description of guardian user for the prohibited area
+const perm_struc ='structure';   // rex_user_role complex_perm 'structure'
+const perm_media ='media';       // rex_user_role complex_perm 'media'
+const editor     ='Editor';      // session parameter of a signed-in Redaxo editor
+const visitor    ='Visitor';     // session parameter of an authenticated visitor
+#
 # ----- installation functions ----------------------------------------
 public static function cache_guardian_users() {
    #   Reads the guardian users from the tables rex_user and rex_user_role
-   #   and stores them as fixed values in a cache file.
+   #   and stores them as fixed values in a cache file. Returns TRUE/FALSE
+   #   depending on whether the cache file has been successfully saved or not.
    #   used functions:
    #      self::get_guardian_users()
+   #   used constants:
+   #      self::this_addon
+   #      self::cache_file
    #
    # --- read the guardian users from table rex_user
    $gusers=self::get_guardian_users();
    #
    # --- store the array in a cache file
-   $cachefile=rex_path::addonCache('access_control',CACHE_FILE);
+   $cachefile=rex_path::addonCache(self::this_addon,self::cache_file);
    return rex_file::put($cachefile,json_encode($gusers));
    }
 public static function get_guardian_users() {
    #   Returns all guardian users in a numbered array (numbering from 1)
    #   whose elements are associative arrays. The guardian user's array
    #   contains the user parameters:
-   #      ['login']       rex_user column 'login'
-   #      ['id']          rex_user column 'id'
-   #      ['description'] rex_user column 'description'
+   #      ['login']           rex_user column 'login'
+   #      ['id']              rex_user column 'id'
+   #      ['description']     rex_user column 'description'
    #      other parameters:
-   #      [PERM_STRUC]    numbered array of IDs of categories
-   #                      that the user has access to (numbering from 0)
-   #      [PERM_MEDIA]    numbered array of IDs of media categories
-   #                      that the user has access to (numbering from 0)   
+   #      [self::perm_struc]  numbered array of IDs of categories
+   #                          that the user has access to (numbering from 0)
+   #      [self::perm_media]  numbered array of IDs of media categories
+   #                          that the user has access to (numbering from 0)   
    #   The data are retrieved from the tables rex_user and rex_user_role.
    #   used functions:
    #      self::guardian_permissions($uid,$permkey)
+   #   used constants:
+   #      self::user_params
+   #      self::protector
+   #      self::guardian
+   #      self::perm_struc
+   #      self::perm_media
    #
-   $where='description=\''.PROTECTOR.'\' OR description=\''.GUARDIAN.'\'';
+   $where='description=\''.self::protector.'\' OR description=\''.self::guardian.'\'';
    #
    # --- read all users who meet the given condition
    $sql=rex_sql::factory();
-   $users=$sql->getArray('SELECT '.USER_PARAMS.' FROM rex_user WHERE '.$where);
+   $users=$sql->getArray('SELECT '.self::user_params.' FROM rex_user WHERE '.$where);
    $us=array();
    $m=0;
    for($i=0;$i<count($users);$i=$i+1):
@@ -98,21 +110,20 @@ public static function get_guardian_users() {
       for($k=0;$k<count($keys);$k=$k+1) if($keys[$k]!='role') $gus[$keys[$k]]=$user[$keys[$k]];
       #     and his permissions
       $uid=$user['id'];
-      $gus[PERM_STRUC]=self::guardian_permissions($uid,PERM_STRUC);
-      $gus[PERM_MEDIA]=self::guardian_permissions($uid,PERM_MEDIA);
+      $gus[self::perm_struc]=self::guardian_permissions($uid,self::perm_struc);
+      $gus[self::perm_media]=self::guardian_permissions($uid,self::perm_media);
       $m=$m+1;
       $us[$m]=$gus;
       endfor;
    return $us;
    }
 public static function guardian_permissions($uid,$permkey) {
-   #   Determines either the category Ids or the media category Ids to
-   #   which a given guardian user has access. The Ids are returned in a
-   #   numbered array (numbering from 0). The data are retrieved from the
-   #   tables rex_user and rex_user_role.
+   #   Determines either the category Ids or the media category Ids that a guardian
+   #   user protects. The Ids are returned in a numbered array (numbering from 0).
+   #   The data are retrieved from the tables rex_user and rex_user_role.
    #   $uid               guardian user's Id [rex_user column 'id']
-   #   $permkey           =PERM_STRUC (access to categories) or
-   #                      =PERM_MEDIA (access to media categories)
+   #   $permkey           =self::perm_struc (access to categories) or
+   #                      =self::perm_media (access to media categories)
    #
    $sql=rex_sql::factory();
    $query='SELECT role FROM rex_user WHERE id='.$uid;
@@ -130,7 +141,8 @@ public static function guardian_permissions($uid,$permkey) {
       $row=$sql->getArray($query);
       $perms=$row[0]['perms'];
       $arr=json_decode($perms,TRUE);
-      $str=$arr[$permkey];
+      $str='';
+      if(isset($arr[$permkey])) $str=$arr[$permkey];
       $brr=explode('|',$str);
       #     collected string of permitted ids like $pmcol='|12|4|...|35'
       for($j=0;$j<count($brr);$j=$j+1) if(!empty($brr[$j])) $pmcol=$pmcol.'|'.$brr[$j];
@@ -152,44 +164,61 @@ public static function guardian_permissions($uid,$permkey) {
 #
 # ----- session functions ---------------------------------------------
 public static function session_set($type,$user) {
-   #   Store an authenticated user as an associative array in session variables:
-   #   $type              =VISITOR: a guardian user has authenticated via sign-in page
-   #                      =EDITOR:  a Redaxo editor has authenticated via backend sign-in
-   #   $user              Array of the authenticated user: $_SESSION[CONTROL][$type][]
-   #     ['login']        rex_user column 'login'
-   #     ['id']           rex_user column 'id'
-   #     [PERM_STRUC]     numbered array of IDs of categories
-   #                      that the user has access to (numbering from 0)
-   #     [PERM_MERDIA]    numbered array of IDs of media categories
-   #                      that the user has access to (numbering from 0)
+   #   Stores an authenticated user as an associative session array:
+   #   $type                 =self::visitor: a visitor user has authenticated via sign-in page
+   #                         =self::editor:  a Redaxo editor has authenticated via backend sign-in
+   #   $user                 Array of the authenticated user, containing these keys:
+   #     ['login']           rex_user column 'login'
+   #     ['id']              rex_user column 'id'
+   #     [self::perm_struc]  numbered array of IDs of categories that either a Redaxo
+   #                         editor has access to or that the guardian user protects
+   #                         (numbering from 0)
+   #     [self::perm_media]  numbered array of IDs of media categories that either a Redaxo
+   #                         editor has access to or that the guardian user protects
+   #                         (numbering from 0)
+   #   So the session aray takes this form:
+   #      $_SESSION[self::this_addon][$type]=$user
+   #      ($type=self::editor or $type=self::visitor)
+   #   example:
+   #      $_SESSION[self::this_addon][self::visitor]['login']         =$user['login']
+   #      $_SESSION[self::this_addon][self::visitor]['id']            =$user['id']
+   #      $_SESSION[self::this_addon][self::visitor][self::perm_struc]=$user[self::perm_struc]                  [self::perm_struc]
+   #      $_SESSION[self::this_addon][self::visitor][self::perm_media]=$user[self::perm_media]                  [self::perm_struc]
+   #   used constants:
+   #      self::this_addon
    #
    if(session_status()!=PHP_SESSION_ACTIVE) session_start();
    $keys=array_keys($user);
    $sesuser=array();
    for($i=0;$i<count($keys);$i=$i+1)
       if($keys[$i]!='description') $sesuser[$keys[$i]]=$user[$keys[$i]];
-   if(count($sesuser)>0) $_SESSION[CONTROL][$type]=$sesuser;
+   if(count($sesuser)>0) $_SESSION[self::this_addon][$type]=$sesuser;
    }
 public static function session_get($type) {
-   #   Returns an authenticated user as array of session variables, see above.
-   #   $type              =VISITOR: returns an authenticated guardian user
-   #                      =EDITOR:  returns an authenticated Redaxo editor
+   #   Returns an authenticated visitor or an Redaxo editor signed in in the backend
+   #   as a session array, see above.
+   #   $type              =self::visitor:  authenticated visitor
+   #                      =self::editor:   signed in Redaxo editor
+   #   used constants:
+   #      self::this_addon
    #
    if(session_status()!=PHP_SESSION_ACTIVE) session_start();
    $user=array();
-   if(isset($_SESSION[CONTROL][$type])) $user=$_SESSION[CONTROL][$type];
+   if(isset($_SESSION[self::this_addon][$type])) $user=$_SESSION[self::this_addon][$type];
    return $user;
    }
 public static function session_end($user) {
-   #   Ends session.
-   #   $user              array of the guardian user having authenticated
-   #                      via sign-in page
+   #   Ends session. Signs off an authenticated visitor.
+   #   $user              array of the visitor having authenticated via sign-in page
+   #   used constants:
+   #      self::this_addon
+   #      self::visitor
    #
    if(isset($user)):
      if(session_status()!=PHP_SESSION_ACTIVE) session_start();
      $sesuser=array();
-     if(isset($_SESSION[CONTROL][VISITOR])) $sesuser=$_SESSION[CONTROL][VISITOR];
-     if($sesuser==$user) unset($_SESSION[CONTROL][VISITOR]);
+     if(isset($_SESSION[self::this_addon][self::visitor])) $sesuser=$_SESSION[self::this_addon][self::visitor];
+     if($sesuser==$user) unset($_SESSION[self::this_addon][self::visitor]);
      endif;
    }
 #
@@ -218,7 +247,7 @@ public static function protected_or_prohibited() {
    #              - the visitor has not authenticated via sign-in page
    #                (giving login and password of one of the guardian users
    #                protecting a category containing the article) or
-   #              = Id of the guarding user who controls access to the category
+   #              = Id of the guarding user who protects the access to the category
    #                that contains the current article
    #   used functions:
    #      self::guardian_users()
@@ -256,41 +285,48 @@ public static function guardian_users() {
    #   Returns all guardian users in a numbered array (numbering from 1).
    #   whose elements are associative arrays containing
    #      user parameters:
-   #      ['login']       rex_user column 'login'
-   #      ['id']          rex_user column 'id'
-   #      ['description'] rex_user column 'description'
+   #      ['login']           rex_user column 'login'
+   #      ['id']              rex_user column 'id'
+   #      ['description']     rex_user column 'description'
    #      other parameters:
-   #      [PERM_STRUC]    numbered array of IDs of categories
-   #                      that the user has access to (numbering from 0)
-   #      [PERM_MEDIA]    numbered array of IDs of media categories
-   #                      that the user has access to (numbering from 0)
+   #      [self::perm_struc]  numbered array of IDs of categories
+   #                          that the user has access to (numbering from 0)
+   #      [self::perm_media]  numbered array of IDs of media categories
+   #                          that the user has access to (numbering from 0)
    #   The data are read from a cache file.
    #   used functions:
    #      self::cache_guardian_users()
+   #   used constants:
+   #      self::this_addon
+   #      self::cache_file
    #
-   $cachefile=rex_path::addonCache(CONTROL,CACHE_FILE);
+   $cachefile=rex_path::addonCache(self::this_addon,self::cache_file);
    if(!file_exists($cachefile)) self::cache_guardian_users();
    $gusers=rex_file::getCache($cachefile);
    return $gusers;
    }
 public static function rex_editor() {
    #   Returns the Redaxo editor in an assocative array if he has authenticated:
-   #      ['login']       rex_user column 'login'
-   #      ['id']          rex_user 'id'
-   #      [PERM_STRUC]    numbered array of IDs of categories
-   #                      that the user has access to (numbering from 0)
-   #      [PERM_MEDIA]    numbered array of IDs of media categories
-   #                      that the user has access to (numbering from 0)
+   #      ['login']           rex_user column 'login'
+   #      ['id']              rex_user 'id'
+   #      [self::perm_struc]  numbered array of IDs of categories
+   #                          that the user has access to (numbering from 0)
+   #      [self::perm_media]  numbered array of IDs of media categories
+   #                          that the user has access to (numbering from 0)
    #   The editor's user parameter array is taken from this session array:
-   #                      $_SESSION[CONTROL][EDITOR]
+   #                          $_SESSION[self::this_addon][self::editor]
    #   If there is no such session array it is set here.
    #   used functions:
    #      self::guardian_permissions($uid,$permkey)
    #      self::session_get($type)
    #      self::session_set($type,$user)
+   #   used constants:
+   #      self::editor
+   #      self::perm_struc
+   #      self::perm_media
    #
    # --- get Redaxo editor from session array
-   $editor=self::session_get(EDITOR);
+   $editor=self::session_get(self::editor);
    #
    # --- get current Redaxo editor from database
    $beuser=rex_backend_login::createUser();
@@ -310,11 +346,11 @@ public static function rex_editor() {
        $uid=$beuser->getId();
        $editor['login']   =$belogin;
        $editor['id']      =$uid;
-       $editor[PERM_STRUC]=self::guardian_permissions($uid,PERM_STRUC);
-       $editor[PERM_MEDIA]=self::guardian_permissions($uid,PERM_MEDIA);
+       $editor[self::perm_struc]=self::guardian_permissions($uid,self::perm_struc);
+       $editor[self::perm_media]=self::guardian_permissions($uid,self::perm_media);
        endif;
      endif;
-   self::session_set(EDITOR,$editor);
+   self::session_set(self::editor,$editor);
    #
    return $editor;
    }
@@ -327,8 +363,12 @@ public static function protected_or_prohibited_intern($art_id,$gusers,$rexeditor
    #   used functions:
    #      self::article_guardian_users($art_id,$gusers)
    #      self::session_get($type)
+   #  used constants:
+   #      self::guardian
+   #      self::visitor
+   #      self::perm_struc
    #
-   # --- guardian users who control access to a category that contains the article
+   # --- guardian users who protect access to a category that contains the article
    $art_gusers=self::article_guardian_users($art_id,$gusers);
    #
    # --- proof whether the access to the current article is allowed
@@ -348,7 +388,7 @@ public static function protected_or_prohibited_intern($art_id,$gusers,$rexeditor
    # --- prohibited area, access denied
    if(count($prot)<=0):
      for($i=1;$i<=count($art_gusers);$i=$i+1)
-        if($art_gusers[$i]['description']==GUARDIAN)
+        if($art_gusers[$i]['description']==self::guardian)
           $prot=array('id'=>$art_gusers[$i]['id'],'protect'=>1);
      endif;
    #
@@ -357,9 +397,9 @@ public static function protected_or_prohibited_intern($art_id,$gusers,$rexeditor
      if(count($rexeditor)>0):
        $redid=$rexeditor['id'];
        if($redid>=2):
-         $catid=$rexeditor[PERM_STRUC];
+         $catid=$rexeditor[self::perm_struc];
          for($i=1;$i<=count($art_gusers);$i=$i+1):
-            $cid=$art_gusers[$i][PERM_STRUC];
+            $cid=$art_gusers[$i][self::perm_struc];
             for($k=0;$k<count($catid);$k=$k+1)
                if($catid[$k]==$cid) $prot=array('id'=>$redid,'protect'=>0);
             endfor;
@@ -369,7 +409,7 @@ public static function protected_or_prohibited_intern($art_id,$gusers,$rexeditor
    #
    # --- protected category, visitor authenticated
    if(count($prot)<=0):
-     $visitor=self::session_get(VISITOR);
+     $visitor=self::session_get(self::visitor);
      if(count($visitor)>0):
        $uid=0;
        for($i=1;$i<=count($art_gusers);$i=$i+1)
@@ -385,7 +425,7 @@ public static function protected_or_prohibited_intern($art_id,$gusers,$rexeditor
    if(count($prot)<=0):
      $uidstr='';
      for($i=1;$i<=count($art_gusers);$i=$i+1):
-        if($art_gusers[$i]['description']==GUARDIAN) continue;
+        if($art_gusers[$i]['description']==self::guardian) continue;
         $uidstr=$uidstr.','.$art_gusers[$i]['id'];
         endfor;
      if(!empty($uidstr)) $uidstr=substr($uidstr,1);
@@ -398,21 +438,23 @@ public static function protected_or_prohibited_intern($art_id,$gusers,$rexeditor
    return $uid;
    }
 public static function article_guardian_users($art_id,$gusers) {
-   #   Returns the users controlling the access to a category of a given
-   #   article (guardian users) in a numbered array (numbering from 1).
+   #   Returns the guardian users protecting the access to a category of a given
+   #   article in a numbered array (numbering from 1).
    #   Each user is represented as an associative array containing
-   #      ['login']       his login (column 'login')
-   #      ['id']          his Id (column 'id')
-   #      ['description'] his description (column 'description')
-   #      [PERM_STRUC]    the Id of the protected category containing the article
-   #   $art_id            Id of the given article
-   #   $gusers            array of guarding users
+   #      ['login']           his login (column 'login')
+   #      ['id']              his Id (column 'id')
+   #      ['description']     his description (column 'description')
+   #      [self::perm_struc]  the Id of the protected category containing the article
+   #   $art_id                Id of the given article
+   #   $gusers                array of guarding users
+   #   used constants:
+   #      self::perm_struc
    #
    # --- article located in any protected or prohibited category?
    $cat_id='';
    $art=rex_article::get($art_id);
    for($i=1;$i<=count($gusers);$i=$i+1):
-      $catid=$gusers[$i][PERM_STRUC];
+      $catid=$gusers[$i][self::perm_struc];
       for($k=0;$k<count($catid);$k=$k+1):
          $cid=$catid[$k];
          if($art_id==$cid):
@@ -435,22 +477,22 @@ public static function article_guardian_users($art_id,$gusers) {
    $m=0;
    $prot=array();
    for($i=1;$i<=count($gusers);$i=$i+1):
-      $catid=$gusers[$i][PERM_STRUC];
+      $catid=$gusers[$i][self::perm_struc];
       for($k=0;$k<count($catid);$k=$k+1)
          if($catid[$k]==$cat_id):
            $m=$m+1;
            $prot[$m]=array('id'=>$gusers[$i]['id'],'login'=>$gusers[$i]['login'],
-                          'description'=>$gusers[$i]['description'],PERM_STRUC=>$cat_id);
+                          'description'=>$gusers[$i]['description'],self::perm_struc=>$cat_id);
            endif;
       endfor;
    return $prot;
    }
 #
 # ----- protecting media categories functions -------------------------
-public static function print_file($file,$media_type='') {
-   #   Displaying a media file (or an error file, if no access is allowed).
+public static function control_file($file) {
+   #   Decides whether a media file is allowed to be displayed. If not,
+   #   $_GET['rex_media_file'] is set to the absolute URL path of an error file.
    #   $file              given media file (relative file name)
-   #   $media_type        given media type
    #   used functions:
    #      self::guardian_users()
    #      self::rex_editor()
@@ -458,31 +500,22 @@ public static function print_file($file,$media_type='') {
    #      self::top_parent_media_category($file)
    #      self::session_get($type)
    #      self::get_rex_user($uid)
-   #      rex_media_manager::sendMedia()
-   #      rex_response::setHeader('Last-Modified','...')
-   #      rex_response::sendFile($file,$contentType,$contentDisposition)
-   #
-   $gusers=self::guardian_users();
-   $rexeditor=self::rex_editor();
-   #
-   # --- rex_media_manager object and absolute path to the media file
-   $counter=rex_media_manager::deleteCache($file,$media_type);
-   $manager=rex_media_manager::create($media_type,$file);
-   $medfile=$manager->getMedia()->getMediaPath();
-   $medfile=dirname($medfile.'zzz').'/'.$file;  // in case of $medfile='.../media/'
-   $mtype='';
-   if(file_exists($medfile)) $mtype=mime_content_type($medfile);
-   #
-   # --- output error image (file not found)
-   if(empty($file) or !file_exists($medfile) or $mtype=='directory')
-     $manager->sendMedia();
+   #   used constants:
+   #      self::this_addon
+   #      self::visitor
+   #      self::perm_media
    #
    # --- media file protected?
-   $protected=FALSE;
+   $gusers=self::guardian_users();
    $protid=self::media_guardian_users($file,$gusers);
-   if(count($protid)>0) $protected=TRUE;
+   if(count($protid)>0):
+     $protected=TRUE;
+     else:
+     $protected=FALSE;;
+     endif;
    #
    # --- access allowed?
+   $rexeditor=self::rex_editor();
    $allowed=TRUE;
    if($protected):
      #     site administrator or Redaxo editor has signed in?
@@ -490,13 +523,13 @@ public static function print_file($file,$media_type='') {
      if($rexeditor['id']==1) $son=TRUE;   // site administrator
      if($rexeditor['id']>=2):
        $tpmcatid=self::top_parent_media_category($file);
-       $catid=$rexeditor[PERM_MEDIA];
+       $catid=$rexeditor[self::perm_media];
        for($k=0;$k<count($catid);$k=$k+1)
           if($catid[$k]==$tpmcatid) $son=TRUE;   // Redaxo editor
        endif;
      if(!$son):
        #     visitor has signed in?
-       $sesuser=self::session_get(VISITOR);
+       $sesuser=self::session_get(self::visitor);
        for($i=1;$i<=count($protid);$i=$i+1):
           $visitor=self::get_rex_user($protid[$i]);
           if($sesuser['login']==$visitor['login']):
@@ -509,31 +542,21 @@ public static function print_file($file,$media_type='') {
      if(!$son) $allowed=FALSE;
      endif;
    #
-   # --- output file
-   if($allowed):
-     rex_response::setHeader('Last-Modified','Wed, 20 Oct 2100 07:28:00 GMT1');
-     if(substr($mtype,0,5)=='image' or $mtype=='application/pdf' or $mtype='plain/text'):
-       $manager->sendMedia();  // images, pdf documents, and text documents
-       else:
-       rex_response::sendFile($medfile,$mtype,'attachment');  // accounting large files
-       endif;
-     else:
-   #
-   # --- output error file (file protected)
-     $errfile=rex_path::addonAssets(CONTROL,'protected.gif');
-     $managed_media=new rex_managed_media($errfile);
-     $manager=new rex_media_manager($managed_media);
-     rex_response::setHeader('Last-Modified','Wed, 20 Oct 2100 07:28:00 GMT1');
-     $manager->sendMedia();
+   # --- re-direct to an error file if access is not allowed
+   if(!$allowed):
+     $_GET['rex_media_file']=rex_url::addonAssets(self::this_addon,'protected.gif');
+     $_GET['rex_media_type']='default';
      endif;
    }
 public static function media_guardian_users($file,$gusers) {
-   #   Determines whether access to a media file is controlled by guardian users.
-   #   The Ids of the guardian users are returned in a numbered array (numbering from 1).
+   #   Determines whether access to a media file is protected by guardian users.
+   #   Returns the Ids of the guardian users in a numbered array (numbering from 1).
    #   $file              given media file (relative file name: /media/$file)
    #   $gusers            array of guarding users
    #   used functions:
    #      self::top_parent_media_category($file)
+   #   used constants:
+   #      self::perm_media
    #
    $uid=array();
    $tpmcatid=self::top_parent_media_category($file);
@@ -543,7 +566,7 @@ public static function media_guardian_users($file,$gusers) {
    for($i=1;$i<=count($gusers);$i=$i+1):
       $user=$gusers[$i];
       $userid=$user['id'];
-      $mid=$user[PERM_MEDIA];
+      $mid=$user[self::perm_media];
       for($k=0;$k<count($mid);$k=$k+1)
          if($mid[$k]==$tpmcatid):
            $m=$m+1;
@@ -577,7 +600,7 @@ public static function top_parent_media_category($file) {
 #
 # ----- login_page ----------------------------------------------------
 public static function login_page() {
-   #   Displays an article for authentication of a guardian user (sign-in page).
+   #   Displays an page containing an authentication form for a guardian user (sign-in page).
    #      Input values:
    #   $_GET['uid']       comma-separated list of Ids of guardian users that are
    #                      allowed to be authenticated on the sign-in page.
@@ -597,19 +620,22 @@ public static function login_page() {
    #      self::session_end($user)
    #      self::locale()
    #      self::session_set($type,$user)
+   #   used constants:
+   #      self::guardian
+   #      self::visitor
    #
    # --- get guardian user's Id, if empty switch to ALL guardian users Ids
    $uidstr='';
    if(!empty($_GET['uid'])) $uidstr=$_GET['uid'];
    if(empty($uidstr)):
      $gusers=self::guardian_users();
-     if(count($gusers)<=0 or (count($gusers)==1 and $gusers[1]['description']=='Guardian')):
+     if(count($gusers)<=0 or (count($gusers)==1 and $gusers[1]['description']==self::guardian)):
        echo '
 <p class="access_control_error">'.rex_i18n::rawMsg('access_control_signin_no_protector').'</p>';
        return;
        endif;
      for($i=1;$i<=count($gusers);$i=$i+1)
-        if($gusers[$i]['description']!=GUARDIAN) $uidstr=$uidstr.','.$gusers[$i]['id'];
+        if($gusers[$i]['description']!=self::guardian) $uidstr=$uidstr.','.$gusers[$i]['id'];
      if(strlen($uidstr)>=1) $uidstr=substr($uidstr,1);
      endif;
    #
@@ -618,7 +644,7 @@ public static function login_page() {
    if(!empty($_POST['action'])) $action=$_POST['action'];
    #
    # --- anyone already logged in?
-   $visitor=self::session_get(VISITOR);
+   $visitor=self::session_get(self::visitor);
    if(count($visitor)>0):
      #     in this case display a logoff button, only
      if(empty($action)):
@@ -646,7 +672,7 @@ public static function login_page() {
    #
    # --- ... or sign off (delete session variables)
    if(!empty($action)):
-     $sesuser=self::session_get(VISITOR);
+     $sesuser=self::session_get(self::visitor);
      self::session_end($sesuser);
      endif;
    #
@@ -702,7 +728,7 @@ public static function login_page() {
      $sesuser=array();
      for($i=1;$i<=count($gusers);$i=$i+1)
         if($gusers[$i]['id']==$uid[$num]) $sesuser=$gusers[$i];
-     self::session_set(VISITOR,$sesuser);
+     self::session_set(self::visitor,$sesuser);
      #     sign-off form
      $success=rex_i18n::rawMsg('access_control_signin_user').' \''.$lognam[$num].'\' '.
               rex_i18n::rawMsg('access_control_signin_authenticated');
@@ -733,8 +759,7 @@ public static function locale() {
    return $locale;
    }
 public static function get_rex_user($uid) {
-   #   Returns data of an user from table rex_user
-   #   (rex_user column 'login', 'password').
+   #   Returns some data of an user from table rex_user (columns 'login', 'password').
    #   $uid               Id of the given user
    #
    if($uid<=0) return array();
