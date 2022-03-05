@@ -1,4 +1,25 @@
 # access_control
+<h4>Version 2.4</h4>
+<ul>
+    <li>In der .htaccess-Datei ist jetzt nur noch die Standard-RewriteRule
+        erforderlich, die Medien-URLs der Form '/media/filename' in die Form
+        '/index.php?rex_media_type=default&rex_media_file=$1' umschreibt.
+        Die Zugriffskontrolle erfolgt also ausschließlich auf der Basis des
+        Media-Manager-URLs.</li>
+    <li>Das AddOn gibt jetzt keine Mediendateien mehr aus. Es verändert
+        lediglich die folgenden PHP-Variablen, wenn der Besucher keinen
+        Zugriff auf eine Mediendatei hat:
+        $_GET['rex_media_file'] erhält den URL der Fehler-Bilddatei im
+        Ordner /assets/addons/access_control/.
+        $_GET['rex_media_type'] wird auf 'default' gesetzt.
+        Dadurch gibt Redaxo anschließend diese Fehler-Bilddatei aus.
+        Die zugehörige Funktion print_file wurde daher umbenannt in
+        control_file.</li>
+    <li>Konstanten werden nicht mehr per 'define(...)' vereinbart,
+        sondern als Klassen-Konstanten definiert.</li>
+    <li>Die Detailbeschreibung enthält jetzt eine besser strukturierte
+        Handlungsanweisung zur Einrichtung der Zugriffskontrolle.</li>
+</ul>
 <h4>Version 2.3.3</h4>
 <ul>
     <li>Der Frontend-Sprachcode rex_i18n::setLocale(...) wird jetzt
