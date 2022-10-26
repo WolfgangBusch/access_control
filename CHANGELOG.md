@@ -1,4 +1,20 @@
 # access_control
+<h4>Version 2.5</h4>
+<ul>
+    <li>Auch Mediendateien in Unterordnern des Medienordners können
+        jetzt mit den Mitteln dieses AddOns geschützt werden. Dazu wird
+        für jeden Top-Unterordner des Medienordners automatisch eine
+        Top-Medienkategorie ('ZZ:ordnername') erzeugt. Wird diese
+        als geschützter Bereich definiert, gilt der Schutz für alle
+        Dateien im Pfad des zugehörigen Top-Medienunterordners.<br>
+        Damit Mediendateien außerhalb des Medienordners mit dem
+        Media-Manager-URL adressiert werden können, muss für ihren
+        Pfad ein Medientyp mit dem entsprechenden "mediapath"-Effekt
+        eingerichtet werden. Für jeden Unterordner des Medienordners
+        ist also ein solcher Medientyp anzulegen.<br>
+        Die Zugehörigkeit zum geschützten Bereich wird hier aus
+        dem Medientyp - anstatt aus der Mediendatei - abgeleitet.</li>
+</ul>
 <h4>Version 2.4</h4>
 <ul>
     <li>In der .htaccess-Datei ist jetzt nur noch die Standard-RewriteRule

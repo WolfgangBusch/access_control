@@ -25,7 +25,11 @@ der inhaltlich aufgebaute Kategorienbaum zugunsten des
 Datenschutzes umstrukturiert werden, indem schutzwürdige
 Artikel in einen geschützten Bereich verschoben werden.</div>
 <div>Analog können vorhandene oder neue Top-Medienkategorien
-als geschützte Bereiche für Mediendateien angelegt werden.</div>
+als geschützte Bereiche für Mediendateien angelegt werden. -
+Auch Mediendateien in Unterordnern des Medienordners können
+auf diese Weise geschützt werden. Dazu wird für jeden
+Top-Unterordner des Medienordners automatisch eine
+Top-Medienkategorie erzeugt.</div>
 <div>Darüber hinaus kann bei Bedarf auch eine Kategorie als
 "verbotener Bereich" definiert werden. Auf diesen hat nur der
 Site-Administrator Lesezugriff als Besucher, wenn er im Backend
