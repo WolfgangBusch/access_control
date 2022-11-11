@@ -3,7 +3,7 @@
  * Access Control AddOn
  * @author wolfgang[at]busch-dettum[dot]de Wolfgang Busch
  * @package redaxo5
- * @version Oktober 2022
+ * @version November 2022
  */
 #
 class access_control {
@@ -546,8 +546,10 @@ public static function control_file($mediatype,$file) {
    #
    # --- re-direct to an error file if access is not allowed
    if(!$allowed):
-     $_GET['rex_media_file']=rex_url::addonAssets(self::this_addon,'protected.gif');
-     $_GET['rex_media_type']='default';
+     $errfile=rex_path::addonAssets(self::this_addon,'protected.gif');
+     $managed_media=new rex_managed_media($errfile);
+     $manager=new rex_media_manager($managed_media);
+     $manager->sendMedia();
      endif;
    }
 public static function media_guardian_users($mediatype,$file,$gusers) {
