@@ -1,4 +1,10 @@
 # access_control
+<h4>Version 2.5.1</h4>
+<ul>
+    <li>Die Ausgabe der Fehler-Bilddatei hat seit Version 2.4 nicht
+        korrekt funktioniert. Daher wird diese nun wieder mittels
+        rex_managed_media-Funktion sendmedia() ausgegeben.</li>
+</ul>
 <h4>Version 2.5</h4>
 <ul>
     <li>Auch Mediendateien in Unterordnern des Medienordners können
