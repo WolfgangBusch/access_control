@@ -3,7 +3,7 @@
  * Access Control AddOn
  * @author wolfgang[at]busch-dettum[dot]de Wolfgang Busch
  * @package redaxo5
- * @version November 2022
+ * @version Februar 2023
  */
 #
 class access_control {
@@ -628,12 +628,6 @@ public static function top_parent_media_category($mediatype,$file) {
      $query3='SELECT id FROM '.$table3.' WHERE parent_id=0 AND name=\''.$topdir.'\'';
      $sql->setQuery($query3);
      if($sql->getRows()>0) $topmedcatid=$sql->getValue('id');
-     if($topmedcatid<=0):
-       #     if not, define it now
-       rex_media_category_service::addCategory($topdir,null);
-       $sql->setQuery($query3);
-       if($sql->getRows()>0) $topmedcatid=$sql->getValue('id');
-       endif;
      endif;
    return $topmedcatid;
    }
