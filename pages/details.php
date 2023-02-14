@@ -3,7 +3,7 @@
  * Access Control AddOn
  * @author wolfgang[at]busch-dettum[dot]de Wolfgang Busch
  * @package redaxo5
- * @version November 2022
+ * @version Februar 2023
  */
 $sta='style="margin-left:20px;"';
 $stb='style="list-style:circle; margin-bottom:0;"';
@@ -78,11 +78,6 @@ rex_i18n::rawMsg("access_control_details_head4").'</b></div>
     <li>'.rex_i18n::rawMsg("access_control_details_par4c").'</li>
     <li>'.rex_i18n::rawMsg("access_control_details_par4d").'</li>
 </ul>
-
-<div><br/><b>'.
-rex_i18n::rawMsg("access_control_details_head5").'</b></div>
-<div class="access_control_indent">'
-.rex_i18n::rawMsg("access_control_details_par5").'</div>
 
 <div>&nbsp;</div>';
 ?>
