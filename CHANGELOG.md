@@ -1,4 +1,16 @@
 # access_control
+<h4>Version 2.5.2</h4>
+<ul>
+    <li>Die in Vers. 2.5 eingeführte automatische Erzeugung von
+        Top-Medienkategorien ist in Vers. 2.5.2 wieder entfernt.
+        Der entsprechende Mechanismus zum Schutz von Mediendateien
+        in Unterordnern des Medienordners bleibt aber erhalten.
+        Die Einrichtung der Top-Medienkategorien kann nun im Rahmen
+        der Verwaltung einer Ordnerstruktur für Mediendateien in
+        einem neuen AddOn (<i>media_directories</i>) erfolgen.
+        Alternativ können sie 'händisch' im Medienpool definiert
+        werden.</li>
+</ul>
 <h4>Version 2.5.1</h4>
 <ul>
     <li>Die Ausgabe der Fehler-Bilddatei hat seit Version 2.4 nicht
