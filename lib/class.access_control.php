@@ -30,6 +30,8 @@ class access_control {
 #            session_get($type)
 #   protecting media categories functions:
 #      control_file($mediatype,$file)
+#         guardian_users()
+#            cache_guardian_users()
 #         media_guardian_users($mediatype,$file,$gusers)
 #            top_parent_media_category($mediatype,$file)
 #         top_parent_media_category($mediatype,$file)
@@ -54,7 +56,7 @@ const perm_struc ='structure';   // rex_user_role complex_perm 'structure'
 const perm_media ='media';       // rex_user_role complex_perm 'media'
 const editor     ='Editor';      // session parameter of a signed-in Redaxo editor
 const visitor    ='Visitor';     // session parameter of an authenticated visitor
-const cat_marker ='ZZ:';         // first part of generated media categories names
+const cat_marker ='ZZmedia:';    // first part of top media categories names
 #
 # ----- installation functions ----------------------------------------
 public static function cache_guardian_users() {
@@ -492,6 +494,7 @@ public static function article_guardian_users($art_id,$gusers) {
 # ----- protecting media categories functions -------------------------
 public static function control_file($mediatype,$file) {
    #   Decides whether a media file is allowed to be displayed. If not,
+   #   $_GET['rex_media_type'] is set to 'default' and
    #   $_GET['rex_media_file'] is set to the absolute URL path of an error file.
    #   $mediatype         given media type (identify files in media subfolders)
    #   $file              given media file (relative file name: /media/$file)
@@ -547,8 +550,10 @@ public static function control_file($mediatype,$file) {
    # --- re-direct to an error file if access is not allowed
    if(!$allowed):
      $errfile=rex_path::addonAssets(self::this_addon,'protected.gif');
-     $managed_media=new rex_managed_media($errfile);
-     $manager=new rex_media_manager($managed_media);
+     $file=substr($errfile,strlen(rex_path::base())-1);
+###     $_GET['rex_media_type']='default';
+###     $_GET['rex_media_file']=$file;
+     $manager=rex_media_manager::create('','..'.$file);
      $manager->sendMedia();
      endif;
    }
@@ -566,19 +571,19 @@ public static function media_guardian_users($mediatype,$file,$gusers) {
    $tpmcatid=self::top_parent_media_category($mediatype,$file);
    if($tpmcatid<=0) return array();
    #
-   $uid=array();
    $m=0;
+   $uid=array();
    for($i=1;$i<=count($gusers);$i=$i+1):
       $user=$gusers[$i];
       $userid=$user['id'];
       $mid=$user[self::perm_media];
       for($k=0;$k<count($mid);$k=$k+1)
-         if($mid[$k]==$tpmcatid):
+        if($mid[$k]==$tpmcatid):
            $m=$m+1;
            $uid[$m]=$userid;
            endif;
-      endfor;
-   return $uid;
+     endfor;
+    return $uid;
    }
 public static function top_parent_media_category($mediatype,$file) {
    #   Returns the Id of top parent_media_category.
@@ -604,29 +609,12 @@ public static function top_parent_media_category($mediatype,$file) {
      else:   
      #
      # --- file is located in a subfolder of the media folder
-     $sql=rex_sql::factory();
-     $table1=rex::getTablePrefix().'media_manager_type';
-     $table2=rex::getTablePrefix().'media_manager_type_effect';
-     $table3=rex::getTablePrefix().'media_category';
-     #     determine the media type Id
-     $query1='SELECT id FROM '.$table1.' WHERE name=\''.$mediatype.'\'';
-     $sql->setQuery($query1);
-     if($sql->getRows()<=0) return 0;
-     $type_id=$sql->getValue('id');
-     #     determine the mediapath from the type's effect
-     $query2='SELECT parameters FROM '.$table2.' WHERE type_id='.$type_id;
-     $sql->setQuery($query2);
-     if($sql->getRows()<=0) return 0;
-     $params=json_decode($sql->getValue('parameters'),TRUE);
-     $mediapath=$params['rex_effect_mediapath']['rex_effect_mediapath_mediapath'];
-     if(empty($mediapath)) return 0;
-     #     determine the top parent subfolder
-     $arr=explode(DIRECTORY_SEPARATOR,$mediapath);
-     if(count($arr)<=1) return 0;
-     $topdir=self::cat_marker.$arr[1];
+     $topdir=self::cat_marker.$mediatype;
      #     top media category already defined?
-     $query3='SELECT id FROM '.$table3.' WHERE parent_id=0 AND name=\''.$topdir.'\'';
-     $sql->setQuery($query3);
+     $sql=rex_sql::factory();
+     $table=rex::getTablePrefix().'media_category';
+     $query='SELECT id FROM '.$table.' WHERE parent_id=0 AND name=\''.$topdir.'\'';
+     $sql->setQuery($query);
      if($sql->getRows()>0) $topmedcatid=$sql->getValue('id');
      endif;
    return $topmedcatid;
