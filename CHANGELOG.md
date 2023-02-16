@@ -1,6 +1,13 @@
 # access_control
 <h4>Version 2.5.2</h4>
 <ul>
+    <li>Die Ausgabe der Fehler-Bilddatei ist noch einmal korrigiert.
+        Das zugehörige rex_managed_media-Objekt wird jetzt mittels
+        rex_media_manager::create(...) erzeugt. -
+        Es funktioniert aber auch mit den Wertzuweisungen:
+        $_GET['rex_media_type']='default';
+        $_GET['rex_media_file']='/assets/addons/access_control/protected.gif';
+        </li>
     <li>Die in Vers. 2.5 eingeführte automatische Erzeugung von
         Top-Medienkategorien ist in Vers. 2.5.2 wieder entfernt.
         Der entsprechende Mechanismus zum Schutz von Mediendateien
