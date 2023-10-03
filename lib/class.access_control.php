@@ -129,8 +129,9 @@ public static function guardian_permissions($uid,$permkey) {
    #                      =self::perm_media (access to media categories)
    #
    $sql=rex_sql::factory();
-   $query='SELECT role FROM rex_user WHERE id='.$uid;
-   $row=$sql->getArray($query);
+   $query='SELECT role FROM rex_user WHERE id= :id';
+   $params = ['id'=> $uid];
+   $row=$sql->getArray($query,$params);
    $rolestr=$row[0]['role'];
    $role=explode(',',$rolestr);
    #
@@ -140,7 +141,8 @@ public static function guardian_permissions($uid,$permkey) {
    $pmcol='';
    for($i=0;$i<count($role);$i=$i+1):
       if(empty($role[$i])) continue;
-      $query='SELECT perms FROM rex_user_role WHERE id='.$role[$i];
+      $query='SELECT perms FROM rex_user_role WHERE id= :id';
+      $params = ['id'=> $role[$i]];
       $row=$sql->getArray($query);
       $perms=$row[0]['perms'];
       $arr=json_decode($perms,TRUE);
@@ -613,8 +615,9 @@ public static function top_parent_media_category($mediatype,$file) {
      #     top media category already defined?
      $sql=rex_sql::factory();
      $table=rex::getTablePrefix().'media_category';
-     $query='SELECT id FROM '.$table.' WHERE parent_id=0 AND name=\''.$topdir.'\'';
-     $sql->setQuery($query);
+     $query='SELECT id FROM '.$table.' WHERE parent_id=0 AND name=:name';
+     $params = ['name'=>$topdir];
+     $sql->setQuery($query,$params);
      if($sql->getRows()>0) $topmedcatid=$sql->getValue('id');
      endif;
    return $topmedcatid;
@@ -787,7 +790,7 @@ public static function get_rex_user($uid) {
    if($uid<=0) return array();
    #
    $sql=rex_sql::factory();
-   $users=$sql->getArray('SELECT login,password FROM rex_user WHERE id='.$uid);
+   $users=$sql->getArray('SELECT login,password FROM rex_user WHERE id= :id',['id'=>$uid]);
    if(count($users)>0) return $users[0];
    return array();
    }
