@@ -1,4 +1,22 @@
 # access_control
+<h4>Version 2.6</h4>
+<ul>
+    <li>Das AddOn erzeugt jetzt ein Authentifizierungs-Formular, abgelegt
+        in der Datei 'signin_page.php' im Basisordner. Bisher benutzte
+        Login-Seiten werden nicht mehr verwendet.</li>
+    <li>Die Einbindung eines Links auf diese Login-Seite im Seiten-Template
+        ist etwas vereinfacht und muss dort entsprechend angepasst werden.
+        Die darin enthaltenen Hinweise sind zweisprachig abgefasst.</li>
+</ul>
+<h4>Version 2.5.3</h4>
+<ul>
+    <li>Das Löschen von AddOn-Cache-Datei und -Ordner in uninstall.php ist
+        überflüssig, weil diese Aktionen bei der De-Installation automatisch
+        erfolgen. uninstall.php ist entsprechend korrigiert. Das händische
+        Löschen an dieser Stelle konnte sogar zu einem Fehler führen
+        (Direktes Löschen des AddOns in der AddOn-Verwaltung nach verheriger
+        De-aktivierung).</li>
+</ul>
 <h4>Version 2.5.2</h4>
 <ul>
     <li>Die Ausgabe der Fehler-Bilddatei ist noch einmal korrigiert.

@@ -25,14 +25,11 @@ der inhaltlich aufgebaute Kategorienbaum zugunsten des
 Datenschutzes umstrukturiert werden, indem schutzwürdige
 Artikel in einen geschützten Bereich verschoben werden.</div>
 <div>Analog können vorhandene oder neue Top-Medienkategorien
-als geschützte Bereiche für Mediendateien angelegt werden. -
-Auch Mediendateien in Unterordnern des Medienordners können
-auf diese Weise geschützt werden (Näheres dazu siehe AddOn
-<i>media_directories</i>).</div>
+als geschützte Bereiche für Mediendateien angelegt werden.</div>
 <div>Darüber hinaus kann bei Bedarf auch eine Kategorie als
-"verbotener Bereich" definiert werden. Auf diesen hat nur der
-Site-Administrator Lesezugriff als Besucher, wenn er im Backend
-eingeloggt ist.</div>
+"verbotener Bereich" definiert werden. Auf diesen hat nur
+der Site-Administrator Lesezugriff als Besucher, wenn er
+im Backend eingeloggt ist.</div>
 
 <div><br/><b>Bewacher-Benutzer:</b></div>
 <div>Die Zuordnung einer geschützten Kategorie bzw.
@@ -43,21 +40,19 @@ geschützte Bereiche zugeordnet werden, sowohl Kategorien als
 auch Medienkategorien.</div>
 
 <div><br/><b>Überprüfung der Zugriffsberechtigung:</b></div>
-<div>Ob ein angeforderter Artikel öffentlich, geschützt oder
-verboten ist, kann mithilfe einer AddOn-Funktion festgestellt
-werden, sinnvollerweise im Seiten-Template. Dort kann ggf.
-ein Hinweis oder ein Link auf die Login-Seite anstelle des
-Artikelinhalts angezeigt werden. Ein exemplarischer
-PHP-Code-Schnipsel ist verfügbar.</div>
+<div>Mithilfe einer AddOn-Funktion lässt sich feststellen,
+ob ein angeforderter Artikel öffentlich, geschützt oder verboten
+ist. Dies geschieht sinnvollerweise im Seiten-Template. Ggf.
+wird dort anstelle des Artikelinhalts ein Link auf ein Formular
+zur Authentifizierung angezeigt.</div>
 <div>Die Überprüfung, ob eine Mediendatei öffentlich oder
 geschützt ist, erfolgt in der Boot-Datei. Bei fehlender
 Zugriffsberechtigung wird anstelle der angeforderten
 Mediendatei ein Standard-Fehlerbild angezeigt.</div>
 
-<div><br/><b>Login-Seite:</b></div>
+<div><br/><b>Authentifizierung:</b></div>
 <div>Um auf einen geschützten Artikel oder eine geschützte
 Mediendatei zugreifen zu können, muss sich ein Besucher vorher
-durch Angabe des Login-Namens und des zugehörigen Passworts
-eines Bewacher-Benutzers authentifizieren. Ein Artikel mit
-Login-Formular kann an passender Stelle als PHP-Einzeiler
-angelegt werden.</div>
+durch Angabe von Login-Namen und Passwort des zugehörigen
+Bewacher-Benutzers authentifizieren. Ein entsprechendes
+Formular ist verfügbar.</div>
