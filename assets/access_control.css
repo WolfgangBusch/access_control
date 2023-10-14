@@ -1,8 +1,10 @@
 /*   a c c e s s - c o n t r o l   */
 /*   description   */
-.access_control_indent { padding-left:20px; }
-/*   sign in form   */
-.access_control_frame { display:inline-block; padding:10px; border:solid 1px grey; }
-.access_control_error { color:red; font-weight:bold; font-size:smaller; }
-.access_control_success { color:blue; font-weight:bold; font-size:smaller; }
-.access_control_input { width:150px; }
+.ac_indent  { padding-left:20px; }
+/*   sign-in form   */
+.ac_button  { border:none; background-color:transparent; cursor:pointer; }
+.ac_table   { display:inline-block; margin:2em; background-color:inherit; }
+.ac_td1     { padding:5px; white-space:nowrap; }
+.ac_td2     { padding:5px; width:100%; }
+.ac_error   { color:red;  font-weight:bold; }
+.ac_success { color:blue; font-weight:bold; }
