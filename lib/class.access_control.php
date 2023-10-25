@@ -278,16 +278,19 @@ public static function access_allowed($uid,$artid=0) {
    if(intval($uid)>0):
      #     message ($uid==1)
      if($uid==1):
-       $parurl=rex_getUrl(rex_article::getSiteStartArticleId());
        $aus=$aus.'
 <p>'.rex_i18n::rawMsg('ac_allowed_prohibited').'</p>';
        else:
        #     current article
        $art_name =$art->getName();
        $parent_id=$art->getParentId();
-       $parart=rex_article::get($parent_id);
-       if($parart->isStartArticle()) $parent_id=$parart->getParentId();
+       if($parent_id<=0) $parent_id=rex_article::getSiteStartArticleId();
        $par_url=rex_getUrl($parent_id);
+       if(!$art->isStartArticle()):
+         $parart=rex_article::get($parent_id);
+         $parent_id=$parart->getParentId();
+         $par_url=rex_getUrl($parent_id);
+         endif;
        $logurl=self::signin_page.'?uid='.$uid.'&locale='.$locale;
        $extras='width=400,height=250,top=20,left=20,titlebar=no,menubar=no,status=no,scollbars=no';
        $button='
@@ -908,7 +911,7 @@ public static function signin_page() {
             <input type="hidden" name="passwd" value=""></td>
         <td class="ac_td2">
             <h4 class="ac_success">'.$success.'.</h4>
-            <p class="ac_success">'.rex_i18n::rawMsg('ac_signin_reload').'</p>
+            <p>'.rex_i18n::rawMsg('ac_signin_reload').'</p>
             <p><br>'.rex_i18n::rawMsg('ac_signin_logoff').' &nbsp;
             <button type="submit" name="action" class="btn btn-apply"
                     value="'.rex_i18n::rawMsg('ac_signin_val_off').'">
