@@ -1,4 +1,8 @@
 # access_control
+<h4>Version 2.6.1</h4>
+<ul>
+    <li>Kleine Korrekturen im Zusammenhang mit der Login-Seite</li>
+</ul>
 <h4>Version 2.6</h4>
 <ul>
     <li>Das AddOn erzeugt jetzt ein Authentifizierungs-Formular, abgelegt
