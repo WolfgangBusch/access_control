@@ -29,7 +29,7 @@ ac_signin_val_off         = signoff
 ac_signin_user            = User
 ac_signin_logoff          = After all User
 ac_signin_authenticated   = authenticated
-ac_signin_reload          = Now please clear the browser cache<br>and reload the page you are accessing!
+ac_signin_reload          = Now reload the page you are accessing, please!
 #
 #   documentation help
 ac_help           = This add-on provides access control for selected areas of articles and/or media files. This means that a visitor in the front end needs authentication to see specific pages or media files. In this way, groups of visitors will be set up, which are delimited from the general public.<br>Access is controlled by authentication of Redaxo users that are assigned the appropriate areas through their roles.<br>The authorization granted is stored session-based.The add-on is fully bilingual (German, English).

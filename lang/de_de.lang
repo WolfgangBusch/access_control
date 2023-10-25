@@ -29,7 +29,7 @@ ac_signin_val_off         = abmelden
 ac_signin_user            = Benutzer
 ac_signin_logoff          = Benutzer doch wieder
 ac_signin_authenticated   = eingeloggt
-ac_signin_reload          = Nun bitte den Browser-Cache löschen<br>und die aufgerufene Seite neu laden!
+ac_signin_reload          = Nun bitte die aufgerufene Seite neu laden!
 #
 #   documentation help
 ac_help           = Dieses AddOn ermöglicht eine Zugriffskontrolle für ausgewählte Bereiche von Artikeln und/oder Mediendateien. Damit ist gemeint, dass ein Besucher im Front-End eine Authentifizierung benötigt, um bestimmte Seiten oder Mediendateien sehen zu dürfen. Auf diese Weise werden Besuchergruppen eingerichtet, die von der allgemeinen Öffentlichkeit abgegrenzt sind.<br>Der Zugriff wird über die Authentifizierung von Redaxo-Benutzern kontrolliert, denen über ihre Rollen die entsprechenden Bereiche zugeordnet sind.<br>Die erfolgte Autorisierung wird Session-basiert gespeichert.<br>Das AddOn ist komplett zweisprachig eingerichtet (deutsch, englisch).
