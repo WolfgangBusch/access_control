@@ -3,7 +3,7 @@
  * Access Control AddOn
  * @author wolfgang[at]busch-dettum[dot]de Wolfgang Busch
  * @package redaxo5
- * @version Oktober 2023
+ * @version November 2023
  */
 $sta='style="margin-left:20px;"';
 $stb='style="list-style:circle; margin-bottom:0;"';

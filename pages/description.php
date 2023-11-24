@@ -3,7 +3,7 @@
  * Access Control AddOn
  * @author wolfgang[at]busch-dettum[dot]de Wolfgang Busch
  * @package redaxo5
- * @version Oktober 2023
+ * @version November 2023
  */
 echo '<div><b>'.rex_i18n::rawMsg('ac_descr_head1').'</b></div>
 <div class="ac_indent">'
