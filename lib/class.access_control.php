@@ -3,7 +3,7 @@
  * Access Control AddOn
  * @author wolfgang[at]busch-dettum[dot]de Wolfgang Busch
  * @package redaxo5
- * @version Oktober 2023
+ * @version November 2023
  */
 #
 class access_control {
@@ -16,7 +16,8 @@ class access_control {
 #      session_get($type)
 #      session_end($user)
 #      access_allowed($uid)
-#         get_locale()
+#         login_link($uid,$title,$linktext)
+#            get_locale()
 #      get_rex_user($uid)
 #   protecting categories functions:
 #      protected_or_prohibited()
@@ -250,9 +251,27 @@ public static function get_locale() {
    if(empty($locale)) $locale=rex_i18n::getLocale();
    return $locale;
    }
+public static function login_link($uid,$title,$linktext) {
+   #   Displays a link to a sign-in page.
+   #   used functions:
+   #      self::get_locale()
+   #
+   # --- locale of the current article
+   $locale=self::get_locale();
+   rex_i18n::setLocale($locale);
+   $logurl=self::signin_page.'?uid='.$uid.'&locale='.$locale;
+   $extras='width=400,height=250,top=20,left=20,titlebar=no,menubar=no,status=no,scollbars=no';
+   return '
+<button onclick="window.open(\''.$logurl.'\',\'_blank\',\''.$extras.'\');"
+        class="ac_button" title="'.$title.'">
+<a href=""><b>'.$linktext.'</b></a>
+</button>';
+   }
 public static function access_allowed($uid,$artid=0) {
-   #   Makes the decision whether to allow read access to an article (normally
-   #   the current article).
+   #   Tells a visitor either that the actual article is located in a restricted
+   #   area or that he must authenticate in order to be allowed to read the
+   #   article (normally the current article). In addition the notice contains
+   #   a link to a sign-in page for authentication.
    #   Used in page template, only. ##########
    #   $uid              controls the contents of the return string:
    #                     <=0:  empty (means: access allowed)
@@ -262,13 +281,7 @@ public static function access_allowed($uid,$artid=0) {
    #   $artid            Id of the article
    #                     if <=0: Id = rex_article::getCurrentId()
    #   used functions:
-   #      self::get_locale()
-   #   used constants:
-   #      self::signin_page
-   #
-   # --- locale of the current article
-   $locale=self::get_locale();
-   rex_i18n::setLocale($locale);
+   #      self::login_link($uid,$title,$linktext)
    #
    # --- generate messages
    $art_id=$artid;
@@ -281,7 +294,7 @@ public static function access_allowed($uid,$artid=0) {
        $aus=$aus.'
 <p>'.rex_i18n::rawMsg('ac_allowed_prohibited').'</p>';
        else:
-       #     current article
+       #     article
        $art_name =$art->getName();
        $parent_id=$art->getParentId();
        if($parent_id<=0) $parent_id=rex_article::getSiteStartArticleId();
@@ -291,17 +304,14 @@ public static function access_allowed($uid,$artid=0) {
          $parent_id=$parart->getParentId();
          $par_url=rex_getUrl($parent_id);
          endif;
-       $logurl=self::signin_page.'?uid='.$uid.'&locale='.$locale;
-       $extras='width=400,height=250,top=20,left=20,titlebar=no,menubar=no,status=no,scollbars=no';
-       $button='
-<button onclick="window.open(\''.$logurl.'\',\'_blank\',\''.$extras.'\');"
-        class="ac_button" title="'.rex_i18n::rawMsg('ac_allowed_button_title').'">
-<a href=""><b>'.rex_i18n::rawMsg('ac_allowed_signin').'</b></a>
-</button>.';
        #     link to sign-in page
+       $title=rex_i18n::rawMsg('ac_allowed_button_title');
+       $linkt=rex_i18n::rawMsg('ac_allowed_signin');
+       $link =self::login_link($uid,$title,$linkt);
+       #     message and link
        $aus=$aus.'
 <p>'.rex_i18n::rawMsg('ac_allowed_article').' &nbsp; <i>"'.$art_name.'"</i> &nbsp; '.rex_i18n::rawMsg('ac_allowed_protected').'</span>,<br>
-'.rex_i18n::rawMsg('ac_allowed_access').$button.'</p>';
+'.rex_i18n::rawMsg('ac_allowed_access').$link.'.</p>';
        endif;
      $aus=$aus.'
 <p><a href="'.$par_url.'">&larr; '.rex_i18n::rawMsg('ac_allowed_back').'</a></p>
@@ -624,8 +634,7 @@ public static function media_guardian_users($mediatype,$file,$gusers) {
    }
 public static function control_file($mediatype,$file) {
    #   Decides whether a media file is allowed to be displayed. If not,
-   #   $_GET['rex_media_type'] is set to 'default' and
-   #   $_GET['rex_media_file'] is set to the absolute URL path of an error file.
+   #   an error file is displayed instead of the requested one
    #   $mediatype         given media type (identify files in media subfolders)
    #   $file              given media file (relative file name: /media/$file)
    #   used functions:
@@ -788,16 +797,16 @@ public static function signin_page() {
 <body>';   
    #
    # --- setLocale
-   if(empty($_GET['locale'])):
+   if(empty(rex_get('locale','string',''))):
      $locale=self::get_locale();
      else:
-     $locale=$_GET['locale'];
+     $locale=rex_get('locale','string','');
      endif;
    rex_i18n::setLocale($locale);
    #
    # --- get guardian user's Id, if empty switch to ALL guardian users Ids
    $uidstr='';
-   if(!empty($_GET['uid'])) $uidstr=$_GET['uid'];
+   if(!empty(rex_get('uid','string',''))) $uidstr=rex_get('uid','string','');
    if(empty($uidstr)):
      $gusers=self::guardian_users();
      if(count($gusers)<=0 or (count($gusers)==1 and $gusers[1]['description']==self::guardian)):
@@ -812,7 +821,7 @@ public static function signin_page() {
    #
    $logoff='';
    $action='';
-   if(!empty($_POST['action'])) $action=$_POST['action'];
+   if(!empty(rex_post('action','string',''))) $action=rex_post('action','string','');
    #
    # --- anyone already logged in?
    $visitor=self::session_get(self::visitor);
@@ -838,8 +847,8 @@ public static function signin_page() {
    # --- get input login name and password ...
    $login ='';
    $passwd='';
-   if(!empty($_POST['login']))  $login =$_POST['login'];
-   if(!empty($_POST['passwd'])) $passwd=$_POST['passwd'];
+   if(!empty(rex_post('login','string','')))  $login =rex_post('login','string','');
+   if(!empty(rex_post('passwd','string',''))) $passwd=rex_post('passwd','string','');
    #
    # --- ... or sign off (delete session variables)
    if(!empty($action)):
