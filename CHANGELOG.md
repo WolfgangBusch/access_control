@@ -2,6 +2,7 @@
 <h4>Version 2.6.2</h4>
 <ul>
     <li>Kleine Korrektur zu rex_get in der boot.php.</li>
+    <li>$_GET, $_POST generell ersetzt durch rex_get(), rex_post().</li>
 </ul>
 <h4>Version 2.6.1</h4>
 <ul>
